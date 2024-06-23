@@ -1,4 +1,4 @@
-name: flutter_application_1
+name: flutter_user
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -30,11 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  carousel_slider: ^4.2.1
-  intl: ^0.17.0 
-  http: ^0.13.6
-  shared_preferences: ^2.2.3
-  flutter_secure_storage: ^9.2.2
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -44,6 +39,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  carousel_slider: ^4.2.1
+  intl: ^0.17.0 
+  http: ^0.13.6
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.2.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
