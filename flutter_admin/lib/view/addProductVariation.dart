@@ -43,10 +43,10 @@ class _AddProductState extends State<AddProductVariation> {
           ),
           const SizedBox(height: 50),
           const SizedBox(height: 30),
-          Container(
-            height: 300,
-            child: ListView.builder(itemBuilder: ),
-          ),
+          // Container(
+          //   height: 300,
+          //   child: ListView.builder(itemBuilder: ),
+          // ),
           Form(
               child: Column(children: [
             Container(
