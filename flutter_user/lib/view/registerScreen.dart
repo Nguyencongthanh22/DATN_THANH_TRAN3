@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_user/view/logInScreen.dart';
+
+import '../methods/api.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,6 +13,27 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  void register() async {
+    final data = {
+      'email': emailController.text.toString(),
+      'name': nameController.text.toString(),
+      'password': passwordController.text.toString(),
+    };
+    final result = await API().postRequset(route: '/register', data: data);
+    final response = jsonDecode(result.body);
+    if (response['status'] == 200) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LogInScreen()));
+    }
+    else
+    {
+       print('Error________________: ${response['message']}');
+    }
+  }
+
   bool isObscure = true;
   @override
   Widget build(BuildContext context) {
@@ -49,10 +74,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: 30),
         Form(
             child: Column(children: [
+          const SizedBox(height: 30),
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
-              //     controller: ,
+              controller: nameController,
+              keyboardType: TextInputType.name,
+              decoration: InputDecoration(
+                  labelText: "Tên",
+                  fillColor: Colors.red[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  )),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+            child: TextFormField(
+              controller: emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                   labelText: "Email",
@@ -70,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
-              //     controller: ,
+              controller: passwordController,
               decoration: InputDecoration(
                 labelText: "Mat khau",
                 fillColor: Colors.red[200],
@@ -87,67 +126,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Icon(isObscure ? Icons.visibility : Icons.visibility_off),
                 ),
               ),
-
               obscureText: isObscure,
               obscuringCharacter: "•",
             ),
           ),
-          Container(
-            margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-            child: TextFormField(
-              //     controller: ,
-              decoration: InputDecoration(
-                labelText: "Xác nhận mật khẩu",
-                fillColor: Colors.red[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isObscure = !isObscure;
-                    });
-                  },
-                  icon:
-                      Icon(isObscure ? Icons.visibility : Icons.visibility_off),
-                ),
-              ),
+          // Container(
+          //   margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+          //   child: TextFormField(
+          //     //     controller: ,
+          //     decoration: InputDecoration(
+          //       labelText: "Xác nhận mật khẩu",
+          //       fillColor: Colors.red[200],
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(20),
+          //       ),
+          //       suffixIcon: IconButton(
+          //         onPressed: () {
+          //           setState(() {
+          //             isObscure = !isObscure;
+          //           });
+          //         },
+          //         icon:
+          //             Icon(isObscure ? Icons.visibility : Icons.visibility_off),
+          //       ),
+          //     ),
 
-              obscureText: isObscure,
-              obscuringCharacter: "•",
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-            child: TextFormField(
-              //     controller: ,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                  labelText: "Số điện thoại",
-                  fillColor: Colors.red[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  )),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-            child: TextFormField(
-              //     controller: ,
-              keyboardType: TextInputType.streetAddress,
-              decoration: InputDecoration(
-                  labelText: "Địa chỉ",
-                  fillColor: Colors.red[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  )),
-            ),
-          ),
+          //     obscureText: isObscure,
+          //     obscuringCharacter: "•",
+          //   ),
+          // ),
+          // Container(
+          //   margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+          //   child: TextFormField(
+          //     //     controller: ,
+          //     keyboardType: TextInputType.number,
+          //     decoration: InputDecoration(
+          //         labelText: "Số điện thoại",
+          //         fillColor: Colors.red[200],
+          //         border: OutlineInputBorder(
+          //           borderRadius: BorderRadius.circular(20),
+          //         )),
+          //   ),
+          // ),
         ])),
         const SizedBox(height: 50),
         ElevatedButton(
           onPressed: () {
-            //           controller.loginUser(context);
+            register();
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
