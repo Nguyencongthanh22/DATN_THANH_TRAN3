@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'view/addProductVariation.dart';
+import 'view/demoAddCart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +12,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AddProductVariation(),
+      home: demo(
+        color: '',
+        size: '',
+        quantity: 1,
+      ),
     );
   }
 }

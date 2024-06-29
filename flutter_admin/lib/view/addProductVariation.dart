@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin/view/cardAddProductVariation.dart';
 import 'addProduct.dart';
 
-
 class AddProductVariation extends StatefulWidget {
   const AddProductVariation({Key? key});
 
@@ -12,14 +11,14 @@ class AddProductVariation extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProductVariation> {
+  List<Widget> productCard = [];
 
-
- 
   String dropdownValueColor = 'Trắng';
   String dropdownValueSize = 'S';
 
   @override
   Widget build(BuildContext context) {
+    var productCards;
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -43,10 +42,19 @@ class _AddProductState extends State<AddProductVariation> {
           ),
           const SizedBox(height: 50),
           const SizedBox(height: 30),
-          // Container(
-          //   height: 300,
-          //   child: ListView.builder(itemBuilder: ),
-          // ),
+          Container(
+            height: 300,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal, // Cho phép scroll ngang
+              itemCount: productCards.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: productCard[index], // Hiển thị từng card sản phẩm
+                );
+              },
+            ),
+          ),
           Form(
               child: Column(children: [
             Container(
@@ -118,8 +126,7 @@ class _AddProductState extends State<AddProductVariation> {
           ])),
           const SizedBox(height: 50),
           ElevatedButton(
-            onPressed: () {
-            },
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red[400],
                 shape: RoundedRectangleBorder(
