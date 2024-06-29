@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
+import '../methods/api.dart';
 
 class Detialproduct extends StatefulWidget {
   const Detialproduct({super.key});
@@ -8,7 +11,9 @@ class Detialproduct extends StatefulWidget {
 }
 
 class _DetialproductState extends State<Detialproduct> {
-  @override
+  
+  
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_user/view/forgotPasswordScreen.dart';
 import 'package:flutter_user/view/registerScreen.dart';
 import 'package:flutter/src/material/icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../methods/api.dart';
+import 'profile.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -12,6 +18,45 @@ class LogInScreen extends StatefulWidget {
 
 class _LogInScreenState extends State<LogInScreen> {
   bool isObscure = true;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  void login() async {
+    final data = {
+      'email': emailController.text,
+      'password': passwordController.text
+    };
+
+    final result = await API().postRequset(route: '/login', data: data);
+
+    if (result.statusCode == 200) {
+      final response = jsonDecode(result.body);
+
+      if (response != null && response['status'] == 200) {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.setInt('user_id', response['user']['id']);
+        await preferences.setString('name', response['user']['name']);
+        await preferences.setString('email', response['user']['email']);
+        await preferences.setString('token', response['token']);
+        String token = response['token'];
+        String email = response['user']['email'];
+        // ScaffoldMessenger.of(context)
+        //     .showSnackBar(SnackBar(content: Text(response['message'])));
+        // print(object)
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Profile(token: token, email: email)));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${response['message']}')));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: ${result.statusCode}')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +99,7 @@ class _LogInScreenState extends State<LogInScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
-              //     controller: ,
+              controller: emailController,
               decoration: InputDecoration(
                   labelText: "Email",
                   fillColor: Colors.red[300],
@@ -71,7 +116,7 @@ class _LogInScreenState extends State<LogInScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
-              //     controller: ,
+              controller: passwordController,
               decoration: InputDecoration(
                 labelText: "Mật khẩu",
                 fillColor: Colors.red[300],
@@ -123,7 +168,7 @@ class _LogInScreenState extends State<LogInScreen> {
         const SizedBox(height: 50),
         ElevatedButton(
           onPressed: () {
-            //           controller.loginUser(context);
+            login();
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
