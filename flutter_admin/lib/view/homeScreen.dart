@@ -1490,23 +1490,27 @@ class _MainScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              bottom: TabBar(tabs: [
-                Tab(
-                  text: "HOME",
-                ),
-                Tab(
-                  text: "NAM",
-                ),
-                Tab(
-                  text: "NỮ",
-                ),
-                Tab(
-                  text: "TRẺ EM",
-                ),
-                Tab(
-                  text: "TRẺ SƠ SINH",
-                ),
-              ]),
+              bottom: TabBar(
+                  tabs: [
+                    Tab(
+                      text: "HOME",
+                    ),
+                    Tab(
+                      text: "NAM",
+                    ),
+                    Tab(
+                      text: "NỮ",
+                    ),
+                    Tab(
+                      text: "TRẺ EM",
+                    ),
+                    Tab(
+                      text: "TRẺ SƠ SINH",
+                    ),
+                  ],
+                  indicatorColor: Colors.red[400],
+                  labelColor: Colors.red[400],
+                  unselectedLabelColor: Colors.grey),
             ),
             body: TabBarView(
               children: [

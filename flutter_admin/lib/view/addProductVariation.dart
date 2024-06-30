@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_admin/view/cardAddProductVariation.dart';
+import 'package:flutter_admin/view/cardAddProduct.dart';
 import 'addProduct.dart';
 
 class AddProductVariation extends StatefulWidget {
@@ -23,7 +23,7 @@ class _AddProductState extends State<AddProductVariation> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
-          'Them san pham',
+          'Thêm sản phẩm',
           style: TextStyle(
               color: Colors.black, fontSize: 25, fontWeight: FontWeight.w400),
         ),
@@ -45,14 +45,14 @@ class _AddProductState extends State<AddProductVariation> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 2),
+              border: Border.all(color: Colors.grey, width: 1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: DropdownButton<String>(
               isExpanded: true,
               value: dropdownValueColor,
               icon: const Icon(Icons.arrow_drop_down),
-              style: const TextStyle(color: Colors.black, fontSize: 20),
+              style: const TextStyle(color: Colors.black, fontSize: 17),
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValueColor = newValue!;
@@ -73,14 +73,14 @@ class _AddProductState extends State<AddProductVariation> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 2),
+              border: Border.all(color: Colors.grey, width: 1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: DropdownButton<String>(
               isExpanded: true,
               value: dropdownValueSize,
               icon: const Icon(Icons.arrow_drop_down),
-              style: const TextStyle(color: Colors.black, fontSize: 20),
+              style: const TextStyle(color: Colors.black, fontSize: 17),
               onChanged: (String? newValue) {
                 setState(() {
                   dropdownValueSize = newValue!;
@@ -135,10 +135,8 @@ class _AddProductState extends State<AddProductVariation> {
         ),
         ElevatedButton(
           onPressed: () {
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => AddProductVariation()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => AddCardProduct()));
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
