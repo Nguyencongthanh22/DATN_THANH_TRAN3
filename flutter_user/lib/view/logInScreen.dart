@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_user/view/account.dart';
 import 'package:flutter_user/view/forgotPasswordScreen.dart';
 import 'package:flutter_user/view/registerScreen.dart';
 import 'package:flutter/src/material/icons.dart';
@@ -44,9 +45,7 @@ class _LogInScreenState extends State<LogInScreen> {
         //     .showSnackBar(SnackBar(content: Text(response['message'])));
         // print(object)
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Profile(token: token, email: email)));
+            context, MaterialPageRoute(builder: (context) => Account()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${response['message']}')));

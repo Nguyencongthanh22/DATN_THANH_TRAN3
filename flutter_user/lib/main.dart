@@ -3,15 +3,18 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_user/view/category/category.dart';
+import 'view/MainScreen.dart';
+import 'view/account.dart';
 import 'view/category/categoryConNam.dart';
+import 'view/homescreen.dart';
 import 'view/logInScreen.dart';
 import 'view/productdetail.dart';
 import 'models/user.dart';
-import 'view/auth_sever.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_user/models/category.dart';
 
 import 'view/registerScreen.dart';
+import 'view/thongbao.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,12 +27,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: RegisterScreen());
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: Catelory2(),
+      // initialRoute: '/',
+      // routes: {
+      //   '/': (context) => const Homescreen(),
+      //   '/cart': (context) => const Catelory2(),
+      //   '/Notification': (context) => const NotificationsScreen(),
+      //   '/profile': (context) => const Account(),
+      // },
+    );
   }
 }
 

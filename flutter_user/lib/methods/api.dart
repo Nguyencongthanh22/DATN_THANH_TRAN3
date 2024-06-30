@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class API {
   late String url;
-  String uri = 'https://b272-113-161-77-223.ngrok-free.app/api';
+  String uri = 'https://1ccf-14-161-33-242.ngrok-free.app/api';
   Dio dio = Dio();
   postRequset({
     required String route,

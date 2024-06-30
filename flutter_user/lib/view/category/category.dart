@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_user/models/category.dart';
 
 import '../../methods/api.dart';
+import 'categoryConNam.dart';
 import 'categoryBB.dart';
 import 'categoryConNam.dart';
 import 'categoryTE.dart';
@@ -353,7 +354,7 @@ class _CateloryState extends State<Catelory2> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
-        length: 4,
+        length: categories.length,
         child: Scaffold(
           appBar: AppBar(
             title: Row(
@@ -402,13 +403,16 @@ class _CateloryState extends State<Catelory2> {
             ),
             bottom: TabBar(
               tabs: [
-                for (int i = 0; i < 4; i++)
-                  Tab(
-                    text: categories.isNotEmpty
-                        ? categories[0]?.id_cha == 0 && categories[0]?.cap == 1
-                            ? categories[i]?.tendanhmuc ?? 'khong'
-                            : 'khong'
-                        : 'Loading...',
+                for (int i = 0; i < categories.length; i++)
+                  Flexible(
+                    child: Tab(
+                      text: categories.isNotEmpty
+                          ? categories[i]?.id_cha == 0 &&
+                                  categories[i]?.cap == 1
+                              ? categories[i]?.tendanhmuc ?? 'khong'
+                              : 'khong'
+                          : 'Loading...',
+                    ),
                   ),
               ],
             ),
@@ -422,8 +426,7 @@ class _CateloryState extends State<Catelory2> {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('Đã xảy ra lỗi: ${snapshot.error}'),
-                    );
+                        child: Text('Đã xảy ra lỗi: ${snapshot.error}'));
                   } else {
                     List<Category> categoryList = snapshot.data ?? [];
                     return SingleChildScrollView(
@@ -463,7 +466,8 @@ class _CateloryState extends State<Catelory2> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => CategoryNam(
+                                              builder: (context) =>
+                                                  CategoryNam2(
                                                     Id_cha: categoriesNam[i]
                                                         ?.id_danhmuc,
                                                   )));

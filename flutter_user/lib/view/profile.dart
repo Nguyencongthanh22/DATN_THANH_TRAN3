@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'auth_sever.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.token, required this.email});
