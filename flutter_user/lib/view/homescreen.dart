@@ -134,7 +134,9 @@ class _HomescreenState extends State<Homescreen> {
                     Center(child: Text('Favorites Tab')),
                     Center(child: Text('Settings Tab')),
                   ],
-                ))));
+                )
+                )
+                ));
   }
 }
 
