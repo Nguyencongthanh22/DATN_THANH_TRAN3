@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 class demo extends StatefulWidget {
@@ -16,7 +15,8 @@ class demo extends StatefulWidget {
   });
 
   @override
-  _CardAddProductVariationState createState() => _CardAddProductVariationState();
+  _CardAddProductVariationState createState() =>
+      _CardAddProductVariationState();
 }
 
 class _CardAddProductVariationState extends State<demo> {
@@ -91,10 +91,4 @@ class _AddProductVariationState extends State<AddProductVariation> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: AddProductVariation(),
-  ));
 }
