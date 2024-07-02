@@ -2,19 +2,22 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_user/view/cartScreen.dart';
 import 'package:flutter_user/view/category/category.dart';
+import 'package:flutter_user/view/numberUpDown.dart';
 import 'view/MainScreen.dart';
 import 'view/account.dart';
 import 'view/category/categoryConNam.dart';
 import 'view/homescreen.dart';
 import 'view/logInScreen.dart';
-import 'view/productdetail.dart';
 import 'models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_user/models/category.dart';
-
+import 'view/cardDetailOrder.dart';
 import 'view/registerScreen.dart';
 import 'view/thongbao.dart';
+
+import 'view/numberUpDown.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Catelory2(),
+      home: 
       // initialRoute: '/',
       // routes: {
       //   '/': (context) => const Homescreen(),
@@ -43,55 +46,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// class LoadPage extends StatefulWidget {
-//   const LoadPage({super.key});
-
-//   @override
-//   State<LoadPage> createState() => _LoadPageState();
-// }
-
-// class _LoadPageState extends State<LoadPage> {
-//   //late AuthService service;
-//   String test = '';
-//   User? user;
-//   Category? category;
-//   // User? get Usernodel => _user;
-
-//   Dio dio = Dio();
-//   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
-//     //service = AuthService();
-//     WidgetsBinding.instance.addPostFrameCallback((_) async {
-//       Map<String, dynamic> formData = {
-//         'id_danhmuc': 2,
-//         //"password": "1234567",
-//       };
-//       final response = await dio.get(
-//           'https://e720-2001-ee0-53d8-5110-b149-8cbf-7185-daf.ngrok-free.app/api/Category',
-//           data: formData,
-//           options: Options(
-//             headers: {
-//               'Accept': 'application/json',
-//             },
-//           ));
-//       print('Lấy data profile: ${response.data}');
-//       setState(() {
-//         test = response.data.toString();
-//         category = Category.fromJson(jsonDecode(jsonEncode(response.data)));
-//       });
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//           child: Text(category?.tendanhmuc == null
-//               ? 'Đéo có'
-//               : category?.tendanhmuc ?? '')),
-//     );
-//   }
-// }
