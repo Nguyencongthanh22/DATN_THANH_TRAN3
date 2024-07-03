@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 //import 'package:carousel_slider/carousel_slider.dart';
 import 'addProduct.dart';
-
+import 'package:flutter_admin/view/cardProduct.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -1486,49 +1486,55 @@ class _MainScreenState extends State<HomeScreen> {
                   labelColor: Colors.red, // Màu chữ khi tab được chọn
                   unselectedLabelColor: Colors.grey,
                 )),
-            body: TabBarView(
-              children: [
-                Center(
-                    child: Column(children: [
-                  // Container(
-                  //   child: CarouselSlider(
-                  //     options: CarouselOptions(
-                  //       height: 200,
-                  //       enlargeCenterPage: true,
-                  //       autoPlay: true,
-                  //       autoPlayInterval: const Duration(seconds: 3),
-                  //       autoPlayAnimationDuration:
-                  //           const Duration(milliseconds: 800),
-                  //       autoPlayCurve: Curves.fastOutSlowIn,
-                  //       viewportFraction: 1.0,
-                  //     ),
-                  //     items: imagelist.map((imagePath) {
-                  //       return Builder(
-                  //         builder: (BuildContext context) {
-                  //           return Container(
-                  //             height: MediaQuery.of(context).size.height,
-                  //             width: MediaQuery.of(context).size.width,
-                  //             margin:
-                  //                 const EdgeInsets.symmetric(horizontal: 5.0),
-                  //             decoration: const BoxDecoration(
-                  //               color: Colors.amber,
-                  //             ),
-                  //             child: Image.asset(
-                  //               imagePath,
-                  //               fit: BoxFit.cover,
-                  //             ),
-                  //           );
-                  //         },
-                  //       );
-                  //     }).toList(),
-                  //   ),
-                  // )
-                ])),
-                Center(child: Text('Favorites Tab')),
-                Center(child: Text('Settings Tab')),
-                Center(child: Text('Favorites Tab')),
-                Center(child: Text('Settings Tab')),
-              ],
+            body: CardProcduct(),
+           
+
+            
+            bottomNavigationBar:  BottomAppBar(
+              child: TabBarView(
+                children: [
+                  Center(
+                      child: Column(children: [
+                    // Container(
+                    //   child: CarouselSlider(
+                    //     options: CarouselOptions(
+                    //       height: 200,
+                    //       enlargeCenterPage: true,
+                    //       autoPlay: true,
+                    //       autoPlayInterval: const Duration(seconds: 3),
+                    //       autoPlayAnimationDuration:
+                    //           const Duration(milliseconds: 800),
+                    //       autoPlayCurve: Curves.fastOutSlowIn,
+                    //       viewportFraction: 1.0,
+                    //     ),
+                    //     items: imagelist.map((imagePath) {
+                    //       return Builder(
+                    //         builder: (BuildContext context) {
+                    //           return Container(
+                    //             height: MediaQuery.of(context).size.height,
+                    //             width: MediaQuery.of(context).size.width,
+                    //             margin:
+                    //                 const EdgeInsets.symmetric(horizontal: 5.0),
+                    //             decoration: const BoxDecoration(
+                    //               color: Colors.amber,
+                    //             ),
+                    //             child: Image.asset(
+                    //               imagePath,
+                    //               fit: BoxFit.cover,
+                    //             ),
+                    //           );
+                    //         },
+                    //       );
+                    //     }).toList(),
+                    //   ),
+                    // )
+                  ])),
+                  Center(child: Text('Favorites Tab')),
+                  Center(child: Text('Settings Tab')),
+                  Center(child: Text('Favorites Tab')),
+                  Center(child: Text('Settings Tab')),
+                ],
+              ),
             ),
             
           )
