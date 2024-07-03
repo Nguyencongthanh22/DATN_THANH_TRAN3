@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_user/view/cartScreen.dart';
 import 'package:flutter_user/view/category/category.dart';
 import 'package:flutter_user/view/numberUpDown.dart';
+import 'package:flutter_user/view/orderDetail.dart';
 import 'view/MainScreen.dart';
 import 'view/account.dart';
 import 'view/category/categoryConNam.dart';
@@ -16,8 +17,10 @@ import 'package:flutter_user/models/category.dart';
 import 'view/cardDetailOrder.dart';
 import 'view/registerScreen.dart';
 import 'view/thongbao.dart';
-
+import 'view/listCardProductOrder.dart';
+import 'view/orderProductDetail.dart';
 import 'view/numberUpDown.dart';
+import 'view/returnProduct.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,10 +35,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: 
+      home: ReturnProduct(),
       // initialRoute: '/',
       // routes: {
       //   '/': (context) => const Homescreen(),

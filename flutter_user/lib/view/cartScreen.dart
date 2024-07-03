@@ -14,14 +14,18 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red[400],
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back)),
-        title: const Text("Giỏ hàng"),
-      ),
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Giỏ hàng',
+            style: TextStyle(
+                color: Colors.black, fontSize: 25, fontWeight: FontWeight.w400),
+          ),
+          leading: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.red,
+              ))),
       body: SingleChildScrollView(
         child: Column(children: [
           //const Divider(),
