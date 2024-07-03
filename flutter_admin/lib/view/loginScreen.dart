@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_admin/view/fogotPasswordScreen.dart';
-import 'package:flutter_admin/view/registerScreen.dart';
 import 'package:flutter/src/material/icons.dart';
+import 'package:flutter_admin/view/homeScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Method/api.dart';
+import 'fogotPasswordScreen.dart';
+import 'registerScreen.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -11,9 +17,46 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-  String dropdownValue = 'Admin';
-
   bool isObscure = true;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  void login() async {
+    final data = {
+      'email': emailController.text,
+      'password': passwordController.text
+    };
+
+    final result = await API().postRequset(route: '/LoginAdmin', data: data);
+
+    if (result.statusCode == 200) {
+      final response = jsonDecode(result.body);
+
+      if (response != null && response['status'] == 200) {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.setInt('user_id', response['user']['id']);
+        await preferences.setString('name', response['user']['name']);
+        await preferences.setString('email', response['user']['email']);
+        await preferences.setInt('quyen', response['user']['quyen']);
+        await preferences.setString('token', response['token']);
+        String token = response['token'];
+        String email = response['user']['email'];
+        int quyen = response['user']['quyen'];
+        // ScaffoldMessenger.of(context)
+        //     .showSnackBar(SnackBar(content: Text(response['message'])));
+        // print(object)
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${response['message']}')));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: ${result.statusCode}')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,31 +93,13 @@ class _LogInScreenState extends State<LogInScreen> {
             )
           ],
         ),
-        DropdownButton<String>(
-          value: dropdownValue,
-          icon: const Icon(Icons.arrow_drop_down),
-          style: const TextStyle(color: Colors.black, fontSize: 20),
-          underline: Container(
-            height: 2,
-            color: Colors.red[300],
-          ),
-          onChanged: (String? newValue) {
-            setState(() {
-              dropdownValue = newValue!;
-            });
-          },
-          items: const [
-            DropdownMenuItem(value: 'Admin', child: Text('Admin')),
-            DropdownMenuItem(value: 'Nhân vien', child: Text('Nhân vien')),
-          ],
-        ),
         const SizedBox(height: 30),
         Form(
             child: Column(children: [
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
-              //     controller: ,
+              controller: emailController,
               decoration: InputDecoration(
                   labelText: "Email",
                   fillColor: Colors.red[300],
@@ -91,7 +116,7 @@ class _LogInScreenState extends State<LogInScreen> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
-              //     controller: ,
+              controller: passwordController,
               decoration: InputDecoration(
                 labelText: "Mật khẩu",
                 fillColor: Colors.red[300],
@@ -143,7 +168,7 @@ class _LogInScreenState extends State<LogInScreen> {
         const SizedBox(height: 50),
         ElevatedButton(
           onPressed: () {
-            //           controller.loginUser(context);
+            login();
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
@@ -185,8 +210,7 @@ class _LogInScreenState extends State<LogInScreen> {
             )
           ],
         )
-      ])
-      ),
+      ])),
     );
   }
 }

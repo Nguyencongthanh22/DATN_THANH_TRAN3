@@ -1,7 +1,10 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
 import '../models/Category.dart';
+import '../models/Product.dart';
 import 'addProduct.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,12 +18,19 @@ class _MainScreenState extends State<HomeScreen> {
   late Future<List<Category2>> futureCategory2;
   late Future<List<Category2>> futureCategory;
   late Future<List<Category2>> futureCategory3;
-
+  late Future<bool> futureAuth;
+  late Future<int?> futureQuyen;
+  late Future<String?> futureEmail;
+  late Future<List<Product>> futureProduct;
   void initState() {
     super.initState();
     futureCategory = fetchData();
     futureCategory2 = fetchData2();
     futureCategory3 = fetchData3();
+    futureAuth = isAuthenticated();
+    futureQuyen = getUserQuyen();
+    futureEmail = getUserEmail();
+    futureProduct = fetchProduct2();
   }
 
   Dio dio = Dio();
@@ -61,6 +71,50 @@ class _MainScreenState extends State<HomeScreen> {
   List<int> categorycap3 = [3];
   List<Category2> categories2 = []; // Danh sách các id danh mục
   List<Category2> categories3 = [];
+  String? email;
+  int? quyen;
+  List<Product?> products = [];
+  bool isLoading = false;
+
+  Future<List<Product>> fetchProduct2() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      products.clear();
+
+      String api = API().getUrl('/ShowproductAll2');
+      final response = await dio.get(
+        api,
+        queryParameters: {'trangthai': 1},
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        List<Product> fetchedProducts =
+            data.map((json) => Product.fromJson(json)).toList();
+        products.addAll(fetchedProducts);
+      } else {
+        print('Error fetching data: ${response.statusCode}');
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+    return products.cast<Product>();
+  }
+
+  
   Future<List<Category2>> fetchData() async {
     List<Category2> categories = [];
 
@@ -182,6 +236,27 @@ class _MainScreenState extends State<HomeScreen> {
     return categories3; // Return list of Category2 objects
   }
 
+  Future<bool> isAuthenticated() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? token = preferences.getString('token');
+    return token != null;
+  }
+
+  Future<String?> getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return email = preferences.getString('email');
+  }
+
+  Future<int?> getUserQuyen() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    quyen = preferences.getInt('quyen');
+    print('_____________________________${quyen}');
+    return quyen;
+  }
+final List<String> imagelist = [
+    "assets/hinh.jpg",
+    "assets/hinh2.jpg",
+  ];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -189,256 +264,354 @@ class _MainScreenState extends State<HomeScreen> {
       home: DefaultTabController(
         length: 5,
         child: Scaffold(
-          appBar: AppBar(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width / 1.47,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () {
-                          showSearch(
-                            context: context,
-                            delegate: CustomSearchDelegate(),
-                          );
-                        },
-                      ),
-                      InkWell(
-                        child: Text(
-                          "Bạn đang tìm kiếm gì?",
-                          style: TextStyle(color: Colors.black),
+            appBar: AppBar(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width / 1.47,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            showSearch(
+                              context: context,
+                              delegate: CustomSearchDelegate(),
+                            );
+                          },
                         ),
-                        onTap: () {
-                          showSearch(
-                            context: context,
-                            delegate: CustomSearchDelegate(),
-                          );
-                        },
-                      )
-                    ],
+                        InkWell(
+                          child: Text(
+                            "Bạn đang tìm kiếm gì?",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          onTap: () {
+                            showSearch(
+                              context: context,
+                              delegate: CustomSearchDelegate(),
+                            );
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Row(
-                  children: [
-                    FloatingActionButton(
-                      mini: true,
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return FutureBuilder<List<Category2>>(
-                              future: futureCategory,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(
-                                      child: Text('Error: ${snapshot.error}'));
-                                } else if (!snapshot.hasData ||
-                                    snapshot.data!.isEmpty) {
-                                  return Center(
-                                      child: Text('No data available'));
-                                } else {
-                                  List<Category2> categories = snapshot.data!;
-                                  return AlertDialog(
-                                    backgroundColor: Colors.white,
-                                    title: Column(
-                                      children: [
-                                        ButtonBar(
-                                          alignment: MainAxisAlignment.center,
+                  Row(
+                    children: [
+                      FloatingActionButton(
+                        mini: true,
+                        onPressed: () {
+                          if (quyen == 1) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return FutureBuilder<List<Category2>>(
+                                  future: futureCategory,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text('Error: ${snapshot.error}'));
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return Center(
+                                          child: Text('No data available'));
+                                    } else {
+                                      List<Category2> categories =
+                                          snapshot.data!;
+                                      return AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        title: Column(
                                           children: [
-                                            for (int i = 0;
-                                                i < categories.length;
-                                                i++)
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return FutureBuilder<
-                                                          List<Category2>>(
-                                                        future: futureCategory2,
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          if (snapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return Center(
-                                                                child:
-                                                                    CircularProgressIndicator());
-                                                          } else if (snapshot
-                                                              .hasError) {
-                                                            return Center(
-                                                                child: Text(
-                                                                    'Error: ${snapshot.error}'));
-                                                          } else if (!snapshot
-                                                                  .hasData ||
-                                                              snapshot.data!
-                                                                  .isEmpty) {
-                                                            return Center(
-                                                                child: Text(
-                                                                    'No data available'));
-                                                          } else {
-                                                            //List<Category2>
-                                                            List<Category2>
-                                                                categories22 =
-                                                                snapshot.data!;
-                                                            categories22 = categories2
-                                                                .where((category) =>
-                                                                    category
-                                                                        .id_cha ==
-                                                                    categories[
-                                                                            i]
-                                                                        .id_danhmuc)
-                                                                .toList();
-                                                            return AlertDialog(
-                                                              title: Column(
-                                                                children: [
-                                                                  ButtonBar(
-                                                                    alignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
+                                            ButtonBar(
+                                              alignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                for (int i = 0;
+                                                    i < categories.length;
+                                                    i++)
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return FutureBuilder<
+                                                              List<Category2>>(
+                                                            future:
+                                                                futureCategory2,
+                                                            builder: (context,
+                                                                snapshot) {
+                                                              if (snapshot
+                                                                      .connectionState ==
+                                                                  ConnectionState
+                                                                      .waiting) {
+                                                                return Center(
+                                                                    child:
+                                                                        CircularProgressIndicator());
+                                                              } else if (snapshot
+                                                                  .hasError) {
+                                                                return Center(
+                                                                    child: Text(
+                                                                        'Error: ${snapshot.error}'));
+                                                              } else if (!snapshot
+                                                                      .hasData ||
+                                                                  snapshot.data!
+                                                                      .isEmpty) {
+                                                                return Center(
+                                                                    child: Text(
+                                                                        'No data available'));
+                                                              } else {
+                                                                // List<Category2> categories2t = snapshot.data!;
+                                                                // categories2t = categories2.where((category) => category.id_cha == categories[i].id_danhmuc).toList();
+                                                                //List<Category2>
+                                                                List<Category2>
+                                                                    categories22 =
+                                                                    snapshot
+                                                                        .data!;
+                                                                categories22 = categories2
+                                                                    .where((category) =>
+                                                                        category
+                                                                            .id_cha ==
+                                                                        categories[i]
+                                                                            .id_danhmuc)
+                                                                    .toList();
+                                                                return AlertDialog(
+                                                                  title: Column(
                                                                     children: [
-                                                                      for (int j =
-                                                                              0;
-                                                                          j < categories22.length;
-                                                                          j++)
-                                                                        ElevatedButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            showDialog(
-                                                                              context: context,
-                                                                              builder: (BuildContext context) {
-                                                                                return FutureBuilder<List<Category2>>(
-                                                                                  future: futureCategory3,
-                                                                                  builder: (context, snapshot) {
-                                                                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                      return Center(child: CircularProgressIndicator());
-                                                                                    } else if (snapshot.hasError) {
-                                                                                      return Center(child: Text('Error: ${snapshot.error}'));
-                                                                                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                                                                      return Center(child: Text('No data available'));
-                                                                                    } else {
-                                                                                      //List<Category2>
-                                                                                      List<Category2> categories32 = snapshot.data!;
-                                                                                      categories32 = categories3.where((category) => category.id_cha == categories2[j].id_danhmuc).toList();
-                                                                                      return AlertDialog(
-                                                                                        title: Column(
-                                                                                          children: [
-                                                                                            ButtonBar(
-                                                                                              alignment: MainAxisAlignment.center,
+                                                                      ButtonBar(
+                                                                        alignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          for (int j = 0;
+                                                                              j < categories22.length;
+                                                                              j++)
+                                                                            ElevatedButton(
+                                                                              onPressed: () {
+                                                                                showDialog(
+                                                                                  context: context,
+                                                                                  builder: (BuildContext context) {
+                                                                                    return FutureBuilder<List<Category2>>(
+                                                                                      future: futureCategory3,
+                                                                                      builder: (context, snapshot) {
+                                                                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                          return Center(child: CircularProgressIndicator());
+                                                                                        } else if (snapshot.hasError) {
+                                                                                          return Center(child: Text('Error: ${snapshot.error}'));
+                                                                                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                                                          return Center(child: Text('No data available'));
+                                                                                        } else {
+                                                                                          //List<Category2>
+                                                                                          List<Category2> categories32 = snapshot.data!;
+                                                                                          categories32 = categories3.where((category) => category.id_cha == categories22[j].id_danhmuc).toList();
+                                                                                          //print('_____________-${categories32}');
+                                                                                          return AlertDialog(
+                                                                                            title: Column(
                                                                                               children: [
-                                                                                                for (int h = 0; h < categories32.length; h++)
-                                                                                                  ElevatedButton(
-                                                                                                    onPressed: () {},
-                                                                                                    child: Text(
-                                                                                                      categories32.isNotEmpty
-                                                                                                          ? categories32[h]?.cap == 3
-                                                                                                              ? categories32[h]?.tendanhmuc ?? 'khong'
-                                                                                                              : 'khong'
-                                                                                                          : 'Loading...',
-                                                                                                    ),
-                                                                                                  )
+                                                                                                ButtonBar(
+                                                                                                  alignment: MainAxisAlignment.center,
+                                                                                                  children: [
+                                                                                                    for (int h = 0; h < categories32.length; h++)
+                                                                                                      if (categories32.isNotEmpty)
+                                                                                                        ElevatedButton(
+                                                                                                          child: Text(
+                                                                                                            categories32.isNotEmpty
+                                                                                                                ? categories32[h]?.cap == 3
+                                                                                                                    ? categories32[h]?.tendanhmuc ?? 'khong'
+                                                                                                                    : 'khong'
+                                                                                                                : 'Loading...',
+                                                                                                          ),
+                                                                                                          onPressed: () {
+                                                                                                            Navigator.push(
+                                                                                                                context,
+                                                                                                                MaterialPageRoute(
+                                                                                                                    builder: (context) => AddProduct(
+                                                                                                                          id_cha: categories32[h]?.id_danhmuc,
+                                                                                                                        )));
+                                                                                                          },
+                                                                                                        )
+                                                                                                  ],
+                                                                                                )
                                                                                               ],
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      );
-                                                                                    }
+                                                                                            ),
+                                                                                          );
+                                                                                        }
+                                                                                      },
+                                                                                    );
                                                                                   },
                                                                                 );
                                                                               },
-                                                                            );
-                                                                          },
-                                                                          child:
-                                                                              Text(
-                                                                            categories22.isNotEmpty
-                                                                                ? categories22[j]?.cap == 2
-                                                                                    ? categories22[j]?.tendanhmuc ?? 'khong'
-                                                                                    : 'khong'
-                                                                                : 'Loading...',
-                                                                          ),
-                                                                        )
+                                                                              child: Text(
+                                                                                categories22.isNotEmpty
+                                                                                    ? categories22[j]?.cap == 2
+                                                                                        ? categories22[j]?.tendanhmuc ?? 'khong'
+                                                                                        : 'khong'
+                                                                                    : 'Loading...',
+                                                                              ),
+                                                                            )
+                                                                        ],
+                                                                      )
                                                                     ],
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            );
-                                                          }
+                                                                  ),
+                                                                );
+                                                              }
+                                                            },
+                                                          );
                                                         },
                                                       );
                                                     },
-                                                  );
-                                                },
-                                                child: Text(
-                                                  categories.isNotEmpty
-                                                      ? categories[i]?.id_cha ==
-                                                                  0 &&
-                                                              categories[i]
-                                                                      ?.cap ==
-                                                                  1
-                                                          ? categories[i]
-                                                                  ?.tendanhmuc ??
-                                                              'khong'
-                                                          : 'khong'
-                                                      : 'Loading...',
-                                                ),
-                                              )
+                                                    child: Text(
+                                                      categories.isNotEmpty
+                                                          ? categories[i]?.id_cha ==
+                                                                      0 &&
+                                                                  categories[i]
+                                                                          ?.cap ==
+                                                                      1
+                                                              ? categories[i]
+                                                                      ?.tendanhmuc ??
+                                                                  'khong'
+                                                              : 'khong'
+                                                          : 'Loading...',
+                                                    ),
+                                                  )
+                                              ],
+                                            ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                }
+                                      );
+                                    }
+                                  },
+                                );
                               },
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Center(
+                                      child: Column(children: [
+                                    Text('Bạn cần có quyền để thêm sản phẩm')
+                                  ])),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: Icon(Icons.add),
+                        backgroundColor: Colors.red[200],
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 200,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 3),
+                      autoPlayAnimationDuration:
+                          const Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.fastOutSlowIn,
+                      viewportFraction: 1.0,
+                    ),
+                    items: imagelist.map((imagePath) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                            decoration: const BoxDecoration(
+                              color: Colors.amber,
+                            ),
+                            child: Image.asset(
+                              imagePath,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: 10),
+                  FutureBuilder<List<Product>>(
+                    future: futureProduct,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Text('No products available');
+                      } else {
+                        return GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.6,
+                          ),
+                          itemCount: snapshot.data!.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {},
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(0.0),
+                                ),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      subtitle: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                height: 170,
+                                                width: 155,
+                                                child: Image.asset(
+                                                  'assets/hinh.jpg',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(snapshot.data![index].ten ?? ''),
+                                          Text(snapshot.data![index].gia ?? ''),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             );
                           },
                         );
-                      },
-                      child: Icon(Icons.add),
-                      backgroundColor: Colors.red[200],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              ],
-            ),
-            bottom: TabBar(tabs: [
-              Tab(text: "HOME"),
-              Tab(text: "NAM"),
-              Tab(text: "NỮ"),
-              Tab(text: "TRẺ EM"),
-              Tab(text: "TRẺ SƠ SINH"),
-            ]),
-          ),
-          body: TabBarView(
-            children: [
-              Center(
-                child: Column(
-                  children: [
-                    // Your content here
-                  ],
-                ),
+                      }
+                    },
+                  ),
+                ],
               ),
-              Center(child: Text('Favorites Tab')),
-              Center(child: Text('Settings Tab')),
-              Center(child: Text('Favorites Tab')),
-              Center(child: Text('Settings Tab')),
-            ],
-          ),
-        ),
+            )),
       ),
     );
   }

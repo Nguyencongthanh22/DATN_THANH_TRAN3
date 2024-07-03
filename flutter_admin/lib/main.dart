@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/view/registerScreen.dart';
 import 'view/addProductVariation.dart';
-import 'view/demoAddCart.dart';
 import 'view/homeScreen.dart';
-import 'view/cardAddProductVariation.dart';
+import 'view/cardAddProduct.dart';
 import 'view/addProduct.dart';
 
 void main() {
@@ -34,8 +34,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: customTheme,
-        home: HomeScreen()
-        );
+      theme: customTheme,
+      debugShowCheckedModeBanner: false,
+      home: RegisterScreen(),
+    );
   }
 }

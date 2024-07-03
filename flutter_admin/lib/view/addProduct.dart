@@ -1,15 +1,61 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/Method/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'addProductVariation.dart';
 
-
 class AddProduct extends StatefulWidget {
-  const AddProduct({super.key});
+  const AddProduct({super.key, this.id_cha});
+  final int? id_cha;
 
   @override
   State<AddProduct> createState() => _AddProductState();
 }
 
+late Future<String?> futureEmail;
+
 class _AddProductState extends State<AddProduct> {
+  final TextEditingController ten = TextEditingController();
+  final TextEditingController mota = TextEditingController();
+  final TextEditingController gia = TextEditingController();
+  String? email;
+  void initState() {
+    super.initState();
+
+    futureEmail = getUserEmail();
+  }
+
+  Future<String?> getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    email = preferences.getString('email');
+    return email;
+  }
+
+  void addproduct() async {
+    final data = {
+      'ten': ten.text.toString(),
+      'mota': mota.text.toString(),
+      'gia': double.parse(gia.text.toString()),
+      'id_danhmuc': widget.id_cha,
+      // 'trangthai': true,
+      'id_email': email,
+    };
+
+    final result = await API().postRequset(route: '/AddProduct', data: data);
+    final response = jsonDecode(result.body);
+
+    if (response['status'] == 200) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AddProductVariation(
+                    ten_sp: ten.text,
+                  )));
+    } else {
+      print('Error________________: ${response['message']}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,12 +66,12 @@ class _AddProductState extends State<AddProduct> {
           style: TextStyle(
               color: Colors.black, fontSize: 25, fontWeight: FontWeight.w400),
         ),
-        leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.red,
-            )),
+        // leading: IconButton(
+        //     onPressed: () => Navigator.pop(context),
+        //     icon: const Icon(
+        //       Icons.arrow_back,
+        //       color: Colors.red,
+        //     )),
       ),
       body: SingleChildScrollView(
           child: Column(children: [
@@ -40,8 +86,9 @@ class _AddProductState extends State<AddProduct> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
+              controller: ten,
               decoration: InputDecoration(
-                  labelText: "Tên sản phẩm",
+                  labelText: 'Tên sản phẩm ',
                   fillColor: Colors.red[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -51,8 +98,10 @@ class _AddProductState extends State<AddProduct> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
+              controller: mota,
+              keyboardType: TextInputType.text,
               decoration: InputDecoration(
-                labelText: "Mô tả",
+                labelText: "Mô tả sản phẩm",
                 fillColor: Colors.red[300],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -63,6 +112,8 @@ class _AddProductState extends State<AddProduct> {
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
+              controller: gia,
+              keyboardType: TextInputType.text,
               decoration: InputDecoration(
                   labelText: "Giá",
                   fillColor: Colors.red[300],
@@ -75,13 +126,7 @@ class _AddProductState extends State<AddProduct> {
         const SizedBox(height: 50),
         ElevatedButton(
           onPressed: () {
-            Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddProductVariation(),
-                  ),
-                );
-            //           controller.loginUser(context);
+            addproduct();
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
