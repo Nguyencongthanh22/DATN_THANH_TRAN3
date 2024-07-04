@@ -142,7 +142,8 @@ class _LogInScreenState extends State<LogInScreen> {
               obscuringCharacter: "•",
             ),
           ),
-        ])),
+        ])
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -209,7 +210,8 @@ class _LogInScreenState extends State<LogInScreen> {
             )
           ],
         )
-      ])),
+      ])
+      ),
     );
   }
 }

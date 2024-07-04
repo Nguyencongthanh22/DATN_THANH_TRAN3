@@ -37,7 +37,6 @@ class _AddProductState extends State<AddProduct> {
       'mota': mota.text.toString(),
       'gia': double.parse(gia.text.toString()),
       'id_danhmuc': widget.id_cha,
-      // 'trangthai': true,
       'id_email': email,
     };
 

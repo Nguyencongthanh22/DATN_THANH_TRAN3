@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_user/models/product.dart';
+import 'package:flutter_user/view/productDetail.dart';
 import '../methods/api.dart';
 
 class Homescreen extends StatefulWidget {
@@ -20,7 +21,6 @@ class _HomescreenState extends State<Homescreen> {
     super.initState();
     futureProduct = fetchData2();
   }
-
 
   List<Product?> products = [];
   bool isLoading = false;
@@ -125,7 +125,6 @@ class _HomescreenState extends State<Homescreen> {
               )
             ],
           ),
-         
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -181,7 +180,12 @@ class _HomescreenState extends State<Homescreen> {
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         return InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductDetail(id_sp: snapshot.data![index].id_sp ,)));
+                          },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(0.0),
@@ -206,7 +210,7 @@ class _HomescreenState extends State<Homescreen> {
                                         ],
                                       ),
                                       Text(snapshot.data![index].ten ?? ''),
-                                      Text(snapshot.data![index].gia ?? ''),
+                                      Text(snapshot.data![index].gia??''),
                                     ],
                                   ),
                                 ),
