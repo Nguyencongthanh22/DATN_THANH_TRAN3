@@ -9,6 +9,10 @@ import 'view/cardProducReview.dart';
 import 'view/editCardProduct.dart';
 import 'view/editProduct.dart';
 import 'view/cardProduct.dart';
+import 'view/listUserInfo.dart';
+import 'view/listStaffInfo.dart';
+import 'view/detailUserInfo.dart';
+import 'view/detailStaffInfo.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,7 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: customTheme,
-      home: ProductDetail(),
+      home: CardStaffInfo(),
     );
   }
 }
