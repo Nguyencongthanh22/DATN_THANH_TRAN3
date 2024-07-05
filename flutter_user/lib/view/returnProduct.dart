@@ -36,34 +36,49 @@ class _ReturnProductState extends State<ReturnProduct> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                   )),
-              // validator: (value){
-              //   if(value==null || controller.emailController.text.isEmpty){
-              //     return "Vui lòng nhập email";
-              //   }
-              // },
+         
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
             child: TextFormField(
               decoration: InputDecoration(
-                labelText: "",
+                labelText: "Tên người gửi",
                 fillColor: Colors.red[300],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
                 
-                
+                 
                 ),
               ),
-              // validator: (value){
-              //   if(value==null || controller.passwordController.text.isEmpty){
-              //     return "Vui lòng nhập mat khau";
-              //   }
-              // },
-              // obscureText: true,
-              
-            )]
+            ),
+            Container(
+            margin: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+            child: TextFormField(
+              decoration: InputDecoration(
+                  labelText: "Số điện thoại",
+                  fillColor: Colors.red[300],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  )),
+         
+            ),
+          ),
+           Container(
+            margin: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+            child: TextFormField(
+              decoration: InputDecoration(
+                  labelText: "Địa chỉ lấy hàng",
+                  fillColor: Colors.red[300],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  )),
+         
+            ),
+          ),
+           
+            ]
             )
             )
     );
