@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
 import '../models/Category.dart';
-import '../models/Product.dart';
+import 'package:flutter_admin/models/Product.dart';
 import 'addProduct.dart';
+import 'package:flutter_admin/view/cardProduct.dart';
+
+import 'productDetail.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,7 +24,7 @@ class _MainScreenState extends State<HomeScreen> {
   late Future<bool> futureAuth;
   late Future<int?> futureQuyen;
   late Future<String?> futureEmail;
-  late Future<List<Product>> futureProduct;
+  late Future<List<Products>> futureProduct;
   void initState() {
     super.initState();
     futureCategory = fetchData();
@@ -73,10 +76,10 @@ class _MainScreenState extends State<HomeScreen> {
   List<Category2> categories3 = [];
   String? email;
   int? quyen;
-  List<Product?> products = [];
+  List<Products?> products = [];
   bool isLoading = false;
 
-  Future<List<Product>> fetchProduct2() async {
+  Future<List<Products>> fetchProduct2() async {
     setState(() {
       isLoading = true;
     });
@@ -95,8 +98,8 @@ class _MainScreenState extends State<HomeScreen> {
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
-        List<Product> fetchedProducts =
-            data.map((json) => Product.fromJson(json)).toList();
+        List<Products> fetchedProducts =
+            data.map((json) => Products.fromJson(json)).toList();
         products.addAll(fetchedProducts);
       } else {
         print('Error fetching data: ${response.statusCode}');
@@ -111,10 +114,9 @@ class _MainScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     }
-    return products.cast<Product>();
+    return products.cast<Products>();
   }
 
-  
   Future<List<Category2>> fetchData() async {
     List<Category2> categories = [];
 
@@ -253,7 +255,8 @@ class _MainScreenState extends State<HomeScreen> {
     print('_____________________________${quyen}');
     return quyen;
   }
-final List<String> imagelist = [
+
+  final List<String> imagelist = [
     "assets/hinh.jpg",
     "assets/hinh2.jpg",
   ];
@@ -515,6 +518,7 @@ final List<String> imagelist = [
                   )
                 ],
               ),
+              
             ),
             body: SingleChildScrollView(
               child: Column(
@@ -550,7 +554,7 @@ final List<String> imagelist = [
                     }).toList(),
                   ),
                   SizedBox(height: 10),
-                  FutureBuilder<List<Product>>(
+                  FutureBuilder<List<Products>>(
                     future: futureProduct,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -565,40 +569,41 @@ final List<String> imagelist = [
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.6,
+                            childAspectRatio: 0.7,
                           ),
                           itemCount: snapshot.data!.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ProductDetail(
+                                              id_sp:
+                                                  snapshot.data![index].id_sp,
+                                            )));
+                              },
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(0.0),
                                 ),
                                 child: Column(
                                   children: [
-                                    ListTile(
-                                      subtitle: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                height: 170,
-                                                width: 155,
-                                                child: Image.asset(
-                                                  'assets/hinh.jpg',
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ],
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 170,
+                                          width: 230,
+                                          child: Image.asset(
+                                            'assets/hinh.jpg',
+                                            fit: BoxFit.cover,
                                           ),
-                                          Text(snapshot.data![index].ten ?? ''),
-                                          Text(snapshot.data![index].gia ?? ''),
-                                        ],
-                                      ),
+                                        ),
+                                        SizedBox(height: 20,),
+                                        Text(snapshot.data![index].ten ?? ''),
+                                        Text(snapshot.data![index].gia ?? ''),
+                                      ],
                                     ),
                                   ],
                                 ),

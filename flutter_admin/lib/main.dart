@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/view/registerScreen.dart';
-import 'view/addProductVariation.dart';
-import 'view/homeScreen.dart';
-import 'view/cardAddProduct.dart';
-import 'view/addProduct.dart';
+import 'view/productDetail.dart';
+import 'view/numberUpDown.dart';
+import 'view/cardProducReview.dart';
+import 'view/editCardProduct.dart';
+import 'view/editProduct.dart';
+import 'view/cardProduct.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,9 +36,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: customTheme,
+      theme: customTheme, 
       debugShowCheckedModeBanner: false,
       home: RegisterScreen(),
+
     );
   }
 }

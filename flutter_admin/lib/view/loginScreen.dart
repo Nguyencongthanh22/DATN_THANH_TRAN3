@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/material/icons.dart';
 import 'package:flutter_admin/view/homeScreen.dart';
+import 'package:flutter_admin/view/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Method/api.dart';

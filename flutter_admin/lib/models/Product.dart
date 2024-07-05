@@ -1,8 +1,6 @@
 
 
-import 'package:flutter/material.dart';
-
-class Product {
+class Products {
   int? id_sp;
   String? ten;
   String? mota;
@@ -10,7 +8,7 @@ class Product {
   int? id_danhmuc;
  // int? trangthai;
   String id_email;
-  Product({
+  Products({
     required this.id_sp,
     required this.ten,
     required this.mota,
@@ -19,8 +17,8 @@ class Product {
     //required this.trangthai,
     required this.id_email
   });
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
+  factory Products.fromJson(Map<String, dynamic> json) {
+    return Products(
       id_sp: json['id_sp'] ?? '',
       ten: json['ten'] ?? '',
       mota: json['mota'],

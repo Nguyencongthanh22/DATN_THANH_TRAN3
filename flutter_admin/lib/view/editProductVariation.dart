@@ -1,29 +1,29 @@
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/models/Product.dart';
 import 'package:flutter_admin/view/cardAddProduct.dart';
+import 'package:flutter_admin/view/editCardProduct.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
 import 'addProduct.dart';
 import 'package:flutter_admin/models/Size.dart';
 
-class AddProductVariation extends StatefulWidget {
-  const AddProductVariation({
+class EditProductVariation extends StatefulWidget {
+  const EditProductVariation({
     Key? key,
-    this.ten_sp,
+    this.id_sp,
   });
-  final String? ten_sp;
+  final int? id_sp;
   @override
-  State<AddProductVariation> createState() => _AddProductState();
+  State<EditProductVariation> createState() => _AddProductState();
 }
 
 late Future<void> futureProduct;
 late Future<void> futureProduct2;
 
-class _AddProductState extends State<AddProductVariation> {
+class _AddProductState extends State<EditProductVariation> {
   void initState() {
     super.initState();
     futureProduct = fetchData();
@@ -42,17 +42,18 @@ class _AddProductState extends State<AddProductVariation> {
     });
 
     try {
-      String api = API().getUrl('/getProduct'); // Construct API endpoint URL
+      String api = API().getUrl('/getProduct2'); // Construct API endpoint URL
       final response = await dio.get(
         api,
-        queryParameters: {'ten': widget.ten_sp},
+        queryParameters: {'id_sp': widget.id_sp},
         options: Options(
           headers: {
             'Accept': 'application/json',
           },
         ),
-      );
+      );    
       print('Response data: ${response.data}');
+
       idproduct = response.data;
     } catch (e) {
       print('Error fetching: $e');
@@ -65,8 +66,8 @@ class _AddProductState extends State<AddProductVariation> {
 
   String dropdownValueColor = '1';
   String dropdownValueSize = '1';
-  String nameColor = '';
-  String nameSize = ''; 
+  String nameColor = 'Trắng';
+  String nameSize = 'S';
   Map<String, String> colorValueMap = {
     '1': 'Trắng',
     '2': 'Đen',
@@ -89,13 +90,13 @@ class _AddProductState extends State<AddProductVariation> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vui lòng chọn tên size và màu sắc')),
       );
-      return; 
+      return;
     }
 
     final data = {
       'id_sp': idproduct,
       'id_size': int.parse(dropdownValueSize),
-      'Ten_size':nameSize, 
+      'Ten_size': nameSize,
       'id_color': int.parse(dropdownValueColor),
       'name_color': nameColor,
       'soluong': int.parse(soluong.text),
@@ -125,6 +126,7 @@ class _AddProductState extends State<AddProductVariation> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
+          
           SnackBar(content: Text('Thêm thất bại')),
         );
       }
@@ -192,31 +194,31 @@ class _AddProductState extends State<AddProductVariation> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        value: dropdownValueSize,
-                        icon: const Icon(Icons.arrow_drop_down),
-                        style: const TextStyle(color: Colors.black, fontSize: 17),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValueSize = newValue!;
-                            nameSize = sizeValueMap[newValue]!;
-                          });
-                        },
-                        items: sizeValueMap.keys.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(sizeValueMap[value]!),
-                          );
-                        }).toList(),
-                      ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 1),
+                      borderRadius: BorderRadius.circular(20),
                     ),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: dropdownValueSize,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      style: const TextStyle(color: Colors.black, fontSize: 17),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValueSize = newValue!;
+                          nameSize = sizeValueMap[newValue]!;
+                        });
+                      },
+                      items: sizeValueMap.keys.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(sizeValueMap[value]!),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   Container(
                     margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
@@ -261,7 +263,7 @@ class _AddProductState extends State<AddProductVariation> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddCardProduct(id_sp: idproduct),
+                    builder: (context) => EditCardProduct(id_sp: idproduct,),
                   ),
                 );
               },
