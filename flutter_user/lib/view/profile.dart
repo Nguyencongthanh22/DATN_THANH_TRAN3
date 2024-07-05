@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_user/methods/api.dart';
 import 'package:flutter_user/models/user.dart';
+import 'package:flutter_user/view/account.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -23,16 +25,22 @@ class _ProfileState extends State<Profile> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
-  List<String> genderOptions = ['Nam', 'Nữ', 'Khác'];
-  String _selectedGender = 'Nam';
+  String? Gender;
   String test = '';
   User? user;
   Dio dio = Dio();
 
+  String dropdownValueNam = '1';
+  String namegender = ' Nam';
+  Map<String, String> GenderValueMap = {
+    '1': ' Nam',
+    '2': ' Nữ',
+    '3': ' Khác',
+  };
+
   @override
   void initState() {
     super.initState();
-    //  service = AuthService();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Map<String, dynamic> formData = {
@@ -54,32 +62,45 @@ class _ProfileState extends State<Profile> {
         _emailController.text = user!.email ?? '';
         _addressController.text = user!.diachi ?? '';
         _phoneController.text = user!.sodienthoai ?? '';
+        Gender = user!.gioitinh ?? '';
         //  _selectedGender = genderOptions.contains(user!.gioitinh) ? user!.gioitinh : 'Nam';
-        //  _birthdayController = user!.ngaysinh;
       });
     });
-
-    TextEditingController _dateController = TextEditingController();
-    DateTime _selectedDate = DateTime.now();
-
-    Future<void> _selectDate(BuildContext context) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: _selectedDate,
-        firstDate: DateTime(1900),
-        lastDate: DateTime.now(),
-      );
-      if (picked != null && picked != _selectedDate) {
-        setState(() {
-          _selectedDate = picked;
-          _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate);
-        });
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    Future<void> updateProfile() async {
+      String api = API().getUrl('/updateProfileUser');
+      try {
+        final response = await Dio().put(
+          api,
+          data: {
+            'email': widget.email,
+            'name': _nameController.text,
+            'diachi': _addressController.text,
+            'sodienthoai': _phoneController.text,
+            'gioitinh': namegender,
+          },
+          options: Options(
+            headers: {
+              'Accept': 'application/json',
+            },
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          print('Profile updated successfully');
+          Navigator.push(
+              context, MaterialPageRoute(builder: ((context) => Account())));
+        } else {
+          print('Failed to update profile: ${response.data}');
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -183,65 +204,41 @@ class _ProfileState extends State<Profile> {
                   height: 10,
                 ),
                 Text(
-                  "SINH NHẬT",
+                  "GIỚI TÍNH: ${Gender}",
                   style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Container(
-                  color: Colors.grey[100],
-                  height: 50,
-                  child: TextFormField(
-                    //controller: _birthdayController,
-                    // onTap: () => _selectDate(context),
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      //labelText: 'Select date',
-                      suffixIcon: Icon(
-                        Icons.calendar_today,
-                        size: 30,
-                      ),
-                    ),
-                  ),
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18),
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                Text(
-                  "GIỚI TÍNH",
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
                 Container(
-                  height: 50,
-                  color: Colors.grey[100],
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    onChanged: (String? value) {
+                  // margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey, width: 1),
+                    borderRadius: BorderRadius.circular(0),
+                  ),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: dropdownValueNam,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                    onChanged: (String? newValue) {
                       setState(() {
-                        _selectedGender = value!;
+                        dropdownValueNam = newValue!;
+                        namegender = GenderValueMap[newValue]!;
                       });
                     },
-                    items: genderOptions
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: GenderValueMap.keys.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value),
+                        child: Text(GenderValueMap[value]!),
                       );
                     }).toList(),
-                    decoration: InputDecoration(
-                      filled: true,
-                      labelText: "Vui lòng chọn giới tính",
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      labelStyle: const TextStyle(color: Colors.black45),
-                      fillColor: Colors.grey[100],
-                      border: OutlineInputBorder(),
-                    ),
                   ),
                 ),
                 SizedBox(
@@ -252,7 +249,10 @@ class _ProfileState extends State<Profile> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                          onPressed: () {},
+                          onPressed: ()  async {
+                              await updateProfile();
+                            },
+                          
                           child: Text(
                             "LƯU",
                             style: TextStyle(

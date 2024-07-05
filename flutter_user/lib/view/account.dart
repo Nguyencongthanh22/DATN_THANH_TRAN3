@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_user/view/profile.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -39,7 +40,13 @@ class _AccountState extends State<Account> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: ((context) =>
+                        //             Profile(token: token, email: email))));
+                      },
                       child: Text(
                         "chỉnh sửa tài khoản",
                         style: TextStyle(

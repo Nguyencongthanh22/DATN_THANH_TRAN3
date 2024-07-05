@@ -8,6 +8,7 @@ import 'package:flutter/src/material/icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../methods/api.dart';
+import 'homescreen.dart';
 import 'profile.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -45,7 +46,7 @@ class _LogInScreenState extends State<LogInScreen> {
         //     .showSnackBar(SnackBar(content: Text(response['message'])));
         // print(object)
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Account()));
+            context, MaterialPageRoute(builder: (context) => Homescreen()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${response['message']}')));

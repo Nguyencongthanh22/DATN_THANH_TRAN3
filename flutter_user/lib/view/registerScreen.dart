@@ -130,44 +130,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               obscuringCharacter: "•",
             ),
           ),
-          // Container(
-          //   margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-          //   child: TextFormField(
-          //     //     controller: ,
-          //     decoration: InputDecoration(
-          //       labelText: "Xác nhận mật khẩu",
-          //       fillColor: Colors.red[200],
-          //       border: OutlineInputBorder(
-          //         borderRadius: BorderRadius.circular(20),
-          //       ),
-          //       suffixIcon: IconButton(
-          //         onPressed: () {
-          //           setState(() {
-          //             isObscure = !isObscure;
-          //           });
-          //         },
-          //         icon:
-          //             Icon(isObscure ? Icons.visibility : Icons.visibility_off),
-          //       ),
-          //     ),
-
-          //     obscureText: isObscure,
-          //     obscuringCharacter: "•",
-          //   ),
-          // ),
-          // Container(
-          //   margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
-          //   child: TextFormField(
-          //     //     controller: ,
-          //     keyboardType: TextInputType.number,
-          //     decoration: InputDecoration(
-          //         labelText: "Số điện thoại",
-          //         fillColor: Colors.red[200],
-          //         border: OutlineInputBorder(
-          //           borderRadius: BorderRadius.circular(20),
-          //         )),
-          //   ),
-          // ),
+      
         ])),
         const SizedBox(height: 50),
         ElevatedButton(
@@ -198,7 +161,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const Text("Bạn đã có tài khoản? "),
             InkWell(
               onTap: () {
-                // chuyển sang màn hình đăng ký
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(

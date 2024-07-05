@@ -27,4 +27,6 @@ class Product {
       trangthai: json['trangthai'] ?? '',
     );
   }
+
+  void addAll(List<Product> fetchedProducts) {}
 }

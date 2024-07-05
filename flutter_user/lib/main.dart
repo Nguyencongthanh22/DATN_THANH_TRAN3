@@ -6,6 +6,7 @@ import 'package:flutter_user/view/cartScreen.dart';
 import 'package:flutter_user/view/category/category.dart';
 import 'package:flutter_user/view/numberUpDown.dart';
 import 'package:flutter_user/view/orderDetail.dart';
+import 'package:flutter_user/view/productDetail.dart';
 import 'view/MainScreen.dart';
 import 'view/account.dart';
 import 'view/category/categoryConNam.dart';
@@ -23,31 +24,37 @@ import 'view/numberUpDown.dart';
 import 'view/returnProduct.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeData customTheme = ThemeData(
+    primaryColor: Colors.red[400], // Màu chủ đạo của ứng dụng
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        foregroundColor: MaterialStateProperty.all(Colors.black),
+        backgroundColor: MaterialStateProperty.all(Colors.white),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+            side: BorderSide(color: Colors.red),
+          ),
+        ),
+      ),
+    ),
+    dialogTheme: DialogTheme(
+      backgroundColor: Colors.white,
+      titleTextStyle: TextStyle(color: Colors.red, fontSize: 24),
+      contentTextStyle: TextStyle(color: Colors.red[400], fontSize: 18),
+    ),
+  );
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: customTheme,
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-      ),
-      home: Homescreen(),
-
-      // initialRoute: '/',
-      // routes: {
-      //   '/': (context) => const Homescreen(),
-      //   '/cart': (context) => const Catelory2(),
-      //   '/Notification': (context) => const NotificationsScreen(),
-      //   '/profile': (context) => const Account(),
-      // },
+      home: LogInScreen(),
     );
   }
 }

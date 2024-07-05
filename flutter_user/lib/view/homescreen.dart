@@ -64,6 +64,30 @@ class _HomescreenState extends State<Homescreen> {
     return products.cast<Product>();
   }
 
+  Future<List<Product>> searchProducts(String query) async {
+    try {
+      String api = API().getUrl('/search');
+      final response = await dio.get(
+        api,
+        queryParameters: {'ten': query},
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((json) => Product.fromJson(json)).toList();
+      } else {
+        print('Error searching data: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error searching data: $e');
+      return [];
+    }
+  }
+
   final List<String> imagelist = [
     "assets/hinh.jpg",
     "assets/hinh2.jpg",
@@ -81,7 +105,7 @@ class _HomescreenState extends State<Homescreen> {
                 width: MediaQuery.of(context).size.width / 1.47,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(15.0),
+                  borderRadius: BorderRadius.circular(0.0),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -91,7 +115,7 @@ class _HomescreenState extends State<Homescreen> {
                       onPressed: () {
                         showSearch(
                           context: context,
-                          delegate: CustomSearchDelegate(),
+                          delegate: CustomSearchDelegate(searchProducts),
                         );
                       },
                     ),
@@ -103,7 +127,7 @@ class _HomescreenState extends State<Homescreen> {
                       onTap: () {
                         showSearch(
                           context: context,
-                          delegate: CustomSearchDelegate(),
+                          delegate: CustomSearchDelegate(searchProducts),
                         );
                       },
                     )
@@ -129,6 +153,9 @@ class _HomescreenState extends State<Homescreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              SizedBox(
+                height: 10,
+              ),
               CarouselSlider(
                 options: CarouselOptions(
                   height: 200,
@@ -174,7 +201,7 @@ class _HomescreenState extends State<Homescreen> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.6,
+                        childAspectRatio: 0.7,
                       ),
                       itemCount: snapshot.data!.length,
                       shrinkWrap: true,
@@ -184,36 +211,28 @@ class _HomescreenState extends State<Homescreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ProductDetail(id_sp: snapshot.data![index].id_sp ,)));
+                                    builder: (context) => ProductDetail(
+                                          id_sp: snapshot.data![index].id_sp,
+                                        )));
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(0.0),
                             ),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ListTile(
-                                  subtitle: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 170,
-                                            width: 155,
-                                            child: Image.asset(
-                                              'assets/hinh.jpg',
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(snapshot.data![index].ten ?? ''),
-                                      Text(snapshot.data![index].gia??''),
-                                    ],
+                                Container(
+                                  height: 170,
+                                  width: 230,
+                                  child: Image.asset(
+                                    'assets/hinh.jpg',
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
+                                SizedBox(height: 10,),
+                                 Text(snapshot.data![index].ten ?? '',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+                                 Text(snapshot.data![index].gia ?? '',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),)
                               ],
                             ),
                           ),
@@ -232,6 +251,10 @@ class _HomescreenState extends State<Homescreen> {
 }
 
 class CustomSearchDelegate extends SearchDelegate<String> {
+  final Future<List<Product>> Function(String) searchProducts;
+
+  CustomSearchDelegate(this.searchProducts);
+
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -256,15 +279,64 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Center(
-      child: Text('Kết quả tìm kiếm cho: $query'),
+    return FutureBuilder<List<Product>>(
+      future: searchProducts(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No products found'));
+        } else {
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final product = snapshot.data![index];
+              return Column(
+                children: [
+                  Container(
+                    color: Colors.grey[60],
+                    height: 80,
+                    child: ListTile(
+                      title: Text(
+                        product.ten ?? '',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                      subtitle: Text(
+                        product.gia ?? '',
+                        style: TextStyle(fontSize: 17),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetail(id_sp: product.id_sp),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  )
+                ],
+              );
+            },
+          );
+        }
+      },
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     return const Center(
-      child: Text('Gợi ý tìm kiếm'),
+      child: Text('Type to search products'),
     );
   }
 }
