@@ -13,6 +13,7 @@ import 'view/listUserInfo.dart';
 import 'view/listStaffInfo.dart';
 import 'view/detailUserInfo.dart';
 import 'view/detailStaffInfo.dart';
+import 'view/promotionScreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: customTheme,
-      home: CardStaffInfo(),
+      home: PromotionScreen(),
     );
   }
 }
