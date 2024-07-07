@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_user/view/numberUpDown.dart';
 import 'package:flutter_user/view/cardProducReview.dart';
+import 'package:flutter_user/view/paymentScreen.dart';
 
 class ProductDetail extends StatefulWidget {
   const ProductDetail({Key? key}) : super(key: key);
@@ -170,7 +171,10 @@ class _ProductDetailState extends State<ProductDetail> {
               child: MaterialButton(
                 color: Colors.red[400],
                 onPressed: () {
-                  // Xử lý khi nhấn vào Mua ngay
+                  Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                 builder: (context) => PaymentScreen()));
                 },
                 child: Container(
                   alignment: Alignment.center,

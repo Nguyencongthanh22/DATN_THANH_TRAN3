@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_user/view/numberUpDown.dart';
+import 'package:flutter_user/view/paymentScreen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -29,7 +29,7 @@ class _CartScreenState extends State<CartScreen> {
       body: SingleChildScrollView(
         child: Column(children: [
           //const Divider(),
-          SizedBox(height: 18),
+          //SizedBox(height: 18),
           Container(
               margin: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -55,7 +55,7 @@ class _CartScreenState extends State<CartScreen> {
                                     top: Radius.circular(18),
                                     bottom: Radius.circular(18))),
                           )),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 10.0, bottom: 4.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -70,8 +70,11 @@ class _CartScreenState extends State<CartScreen> {
                             Text('Mã sản phẩm: '),
                             Text("Màu sắc: "),
                             Text("Kích cỡ: "),
-                            Text(
-                              "So luong:",
+                            Container(
+                              // margin: EdgeInsets.all(15),
+                              height: 40,
+                              width: 135,
+                              child: NumberUpDown(onChanged: (int) {}),
                             ),
                           ],
                         ),
@@ -91,29 +94,45 @@ class _CartScreenState extends State<CartScreen> {
         ]),
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Color.fromRGBO(246, 238, 238, 1),
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Tổng tiền",
-                    style: TextStyle(color: Colors.black, fontSize: 18)),
-                Text("VND", style: TextStyle(color: Colors.black, fontSize: 20))
-              ],
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                alignment: Alignment.center,
+                height: 70,
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Tổng thanh toán:'),
+                    Text('100000',
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold))
+                  ],
+                ),
+              ),
             ),
-            Container(
-              width: 200,
-              height: 900,
-              color: Colors.red[400],
-              child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "Thanh toán",
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                  )),
-            )
-          ])),
+            Expanded(
+              child: MaterialButton(
+                color: Colors.red[400],
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => PaymentScreen()));
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 70,
+                  child: const Text(
+                    'Đặt ngay',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

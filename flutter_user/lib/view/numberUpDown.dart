@@ -31,9 +31,12 @@ class NumberUpDown extends StatefulWidget {
   final int max;
   final Function(int) onChanged;
 
-  NumberUpDown(
-      {Key? key, this.min = 0, this.max = 100, required this.onChanged})
-      : super(key: key);
+  NumberUpDown({
+    Key? key,
+    this.min = 0,
+    this.max = 100,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
   State<NumberUpDown> createState() => _NumberUpDownState();
@@ -53,8 +56,10 @@ class _NumberUpDownState extends State<NumberUpDown> {
     _focusNode = FocusNode();
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
-        _controller.selection =
-            TextSelection(baseOffset: 0, extentOffset: _controller.text.length);
+        _controller.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _controller.text.length,
+        );
       }
     });
   }
@@ -114,48 +119,44 @@ class _NumberUpDownState extends State<NumberUpDown> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: 50,
-        width: 135,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 2), // Viền màu đen
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            IconButton(
-              onPressed: _decrement,
-              icon: Icon(Icons.remove),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  left: BorderSide(color: Colors.black), // Viền bên trái
-                  right: BorderSide(color: Colors.black), // Viền bên phải
-                ),
-              ),
-              width: 50,
-              child: TextField(
-                controller: _controller,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                onChanged: _onChanged,
-                onTap: _onTap,
-                onEditingComplete: _onEditingComplete,
-                style: TextStyle(fontSize: 20),
-                inputFormatters: [
-                  // Optional: You can add input formatters here if needed
-                ],
+    return Container(
+      height: 50,
+      width: 135,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black, width: 2),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          IconButton(
+            onPressed: _decrement,
+            icon: Icon(Icons.remove),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(color: Colors.black),
+                right: BorderSide(color: Colors.black),
               ),
             ),
-            IconButton(
-              onPressed: _increment,
-              icon: Icon(Icons.add),
+            width: 50,
+            child: TextField(
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              onChanged: _onChanged,
+              onTap: _onTap,
+              onEditingComplete: _onEditingComplete,
+              style: TextStyle(fontSize: 20),
+              inputFormatters: [],
             ),
-          ],
-        ),
+          ),
+          IconButton(
+            onPressed: _increment,
+            icon: Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

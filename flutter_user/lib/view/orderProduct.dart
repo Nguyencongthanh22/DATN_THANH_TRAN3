@@ -3,14 +3,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_user/view/cardDetailOrder.dart';
 import 'cardProducRecive.dart';
 
-class OrderDetail extends StatefulWidget {
-  const OrderDetail({super.key});
+class OrderProduct extends StatefulWidget {
+  const OrderProduct({super.key});
 
   @override
-  State<OrderDetail> createState() => _OrderDetailState();
+  State<OrderProduct> createState() => _OrderProductState();
 }
 
-class _OrderDetailState extends State<OrderDetail> {
+class _OrderProductState extends State<OrderProduct> {
   final List<Product> products = [
     Product(
       name: "Product 1",
