@@ -32,6 +32,9 @@ class _ProductDetailState extends State<ProductDetail> {
     productdetail = fetchData();
     productVariations = fetchVariations();
     futureQuyen = getUserQuyen();
+    
+    radioOptionsColor = getUniqueColors(vari);
+     radioOptionsSize = getUniqueSizes(vari);
   }
 
   Future<List<Products>> fetchData() async {
@@ -104,24 +107,33 @@ class _ProductDetailState extends State<ProductDetail> {
   }
 
   List<RadioButtonModel> getUniqueColors(List<Producvaritation> variations) {
-    final seen = <int>{};
-    return variations.where((v) => seen.add(v.id_color!)).map((v) {
-      return RadioButtonModel(
-        isSelected: false, // Default to false if null or not provided
-        buttonText: v.name_color ?? '',
-      );
-    }).toList();
-  }
+  final seenColors = <String>{};
+  return variations.where((v) {
+    // Filter out duplicates
+    return seenColors.add(v.name_color ?? '');
+  }).map((v) {
+    // Map to RadioButtonModel
+    return RadioButtonModel(
+      isSelected: false,
+      buttonText: v.name_color ?? '',
+    );
+  }).toList();
+}
 
-  List<RadioButtonModel> getUniqueSizes(List<Producvaritation> variations) {
-    final seen = <int>{};
-    return variations.where((v) => seen.add(v.id_size!)).map((v) {
-      return RadioButtonModel(
-        isSelected: false, // Đảo ngược giá trị isSelected
-        buttonText: v.Ten_size ?? '',
-      );
-    }).toList();
-  }
+List<RadioButtonModel> getUniqueSizes(List<Producvaritation> variations) {
+  final seenSizes = <String>{};
+  return variations.where((v) {
+    // Filter out duplicates
+    return seenSizes.add(v.Ten_size ?? '');
+  }).map((v) {
+    // Map to RadioButtonModel
+    return RadioButtonModel(
+      isSelected: false,
+      buttonText: v.Ten_size ?? '',
+    );
+  }).toList();
+}
+
 
   List<RadioButtonModel> radioOptionsColor = [];
   List<RadioButtonModel> radioOptionsSize = [];
@@ -170,8 +182,6 @@ class _ProductDetailState extends State<ProductDetail> {
                   return Center(child: Text('No variations found'));
                 } else {
                   vari = variSnapshot.data!;
-                  radioOptionsColor = getUniqueColors(vari);
-                  radioOptionsSize = getUniqueSizes(vari);
 
                   return SingleChildScrollView(
                     padding: EdgeInsets.all(16),
@@ -227,7 +237,12 @@ class _ProductDetailState extends State<ProductDetail> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    option.isSelected = !option.isSelected;
+                                   for (var other in radioOptionsColor) {
+                                      if (other != option) {
+                                        other.isSelected = false;
+                                      }
+                                    }
+                                    option.isSelected = true;
                                   });
                                 },
                                 child: SquareRadioButtonItem(option),

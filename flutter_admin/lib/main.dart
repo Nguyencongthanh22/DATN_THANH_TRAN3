@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/view/loginScreen.dart';
 import 'package:flutter_admin/view/registerScreen.dart';
+import 'view/homeScreen.dart';
 import 'view/productDetail.dart';
 import 'view/numberUpDown.dart';
 import 'view/cardProducReview.dart';
 import 'view/editCardProduct.dart';
 import 'view/editProduct.dart';
 import 'view/cardProduct.dart';
+import 'view/listUserInfo.dart';
+import 'view/listStaffInfo.dart';
+import 'view/detailUserInfo.dart';
+import 'view/detailStaffInfo.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,8 +44,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: customTheme, 
       debugShowCheckedModeBanner: false,
-      home: RegisterScreen(),
-
+      home:HomeScreen(),
     );
   }
 }

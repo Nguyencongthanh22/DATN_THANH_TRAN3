@@ -47,7 +47,7 @@ class _LogInScreenState extends State<LogInScreen> {
         //     .showSnackBar(SnackBar(content: Text(response['message'])));
         // print(object)
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => Profile(token: token,email: email,)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${response['message']}')));

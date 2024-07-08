@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class User {
+class UserClient {
   String? name;
   String? email;
   String? diachi;
   DateTime? ngaysinh;
   String? gioitinh;
   String? sodienthoai;
-  User(
+  UserClient(
       {required this.name,
       required this.email,
       required this.diachi,
@@ -25,7 +25,7 @@ class User {
       "sodienthoai":sodienthoai
     };
   }
-  factory User.fromJson(Map<String, dynamic> json){
+  factory UserClient.fromJson(Map<String, dynamic> json){
     DateTime? parseDate(String dateString) {
       try {
         return DateTime.parse(dateString);
@@ -34,15 +34,13 @@ class User {
         return null;
       }
     }
-    return User(
+    return UserClient(
       name:json['name']??'',
       email: json['email']??'',
       diachi:json['diachi']??'',
       ngaysinh: DateTime.parse(json['ngaysinh']??''),
       gioitinh: json['gioitinh']??'',
       sodienthoai: json['sodienthoai']??''
-      
     );
-    
   }
 }

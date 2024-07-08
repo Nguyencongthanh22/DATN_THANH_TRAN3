@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_admin/view/homeScreen.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Method/api.dart';
 import '../models/user.dart';
+import 'package:intl/intl.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.token, required this.email});
@@ -28,6 +27,8 @@ class _ProfileState extends State<Profile> {
   //TextEditingController _emailController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
+  TextEditingController _ngaySinhController = TextEditingController();
+  DateTime? ngaysinh;
   String? Gender;
   int? Quyen1;
   String test = '';
@@ -69,8 +70,59 @@ class _ProfileState extends State<Profile> {
         _phoneController.text = user!.sodienthoai ?? '';
         Gender = user!.gioitinh ?? '';
         Quyen1 = user!.quyen;
+      
       });
     });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: ngaysinh ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        ngaysinh = picked;
+        _ngaySinhController.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  Future<void> updateProfile() async {
+    String api = API().getUrl('/updateProfile');
+    try {
+      final response = await Dio().put(
+        api,
+        data: {
+          'email': widget.email,
+          'name': _nameController.text,
+          'diachi': _addressController.text,
+          'sodienthoai': _phoneController.text,
+          'ngaysinh':
+              _ngaySinhController.text, // Đảm bảo là ngaysinh là chuỗi ở đây
+          'gioitinh': namegender,
+        },
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print('Profile updated successfully');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: ((context) => HomeScreen())),
+        );
+      } else {
+        print('Failed to update profile: ${response.data}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   int? quyen;
@@ -83,37 +135,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> updateProfile() async {
-      String api = API().getUrl('/updateProfile');
-      try {
-        final response = await Dio().put(
-          api,
-          data: {
-            'email': widget.email,
-            'name': _nameController.text,
-            'diachi': _addressController.text,
-            'sodienthoai': _phoneController.text,
-            'gioitinh': namegender,
-          },
-          options: Options(
-            headers: {
-              'Accept': 'application/json',
-            },
-          ),
-        );
-
-        if (response.statusCode == 200) {
-          print('Profile updated successfully');
-          Navigator.push(
-              context, MaterialPageRoute(builder: ((context) => HomeScreen())));
-        } else {
-          print('Failed to update profile: ${response.data}');
-        }
-      } catch (e) {
-        print('Error: $e');
-      }
-    }
-
     return Scaffold(
         appBar: AppBar(
           title: Row(
@@ -239,6 +260,28 @@ class _ProfileState extends State<Profile> {
                   ),
                   SizedBox(
                     height: 10,
+                  ),
+
+                  Text(
+                    "NGÀY SINH",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 5),
+                  TextFormField(
+                    controller: _ngaySinhController,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      await _selectDate(context);
+                    },
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    cursorColor: Colors.white,
+                    decoration: InputDecoration(
+                      filled: true,
+                      labelText: "Vui lòng nhập ngày sinh của bạn",
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                      labelStyle: TextStyle(color: Colors.black45),
+                      fillColor: Colors.grey[100],
+                    ),
                   ),
                   Text(
                     "GIỚI TÍNH: ${Gender}",

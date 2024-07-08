@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
 import '../models/Category.dart';
 import 'package:flutter_admin/models/Product.dart';
+import '../models/Image.dart';
 import 'addProduct.dart';
 import 'package:flutter_admin/view/cardProduct.dart';
 
@@ -25,6 +26,7 @@ class _MainScreenState extends State<HomeScreen> {
   late Future<int?> futureQuyen;
   late Future<String?> futureEmail;
   late Future<List<Products>> futureProduct;
+  late Future<List<Image2>> futureImage2;
   void initState() {
     super.initState();
     futureCategory = fetchData();
@@ -34,6 +36,7 @@ class _MainScreenState extends State<HomeScreen> {
     futureQuyen = getUserQuyen();
     futureEmail = getUserEmail();
     futureProduct = fetchProduct2();
+    futureImage2 = GetImage();
   }
 
   Dio dio = Dio();
@@ -77,6 +80,7 @@ class _MainScreenState extends State<HomeScreen> {
   String? email;
   int? quyen;
   List<Products?> products = [];
+  List<Image2?> Images = [];
   bool isLoading = false;
 
   Future<List<Products>> fetchProduct2() async {
@@ -101,6 +105,7 @@ class _MainScreenState extends State<HomeScreen> {
         List<Products> fetchedProducts =
             data.map((json) => Products.fromJson(json)).toList();
         products.addAll(fetchedProducts);
+        print('_________________${response.data}');
       } else {
         print('Error fetching data: ${response.statusCode}');
       }
@@ -238,6 +243,25 @@ class _MainScreenState extends State<HomeScreen> {
     return categories3; // Return list of Category2 objects
   }
 
+  Future<List<Image2>> GetImage() async {
+    String api = API().getUrl('/getImage');
+    final response = await dio.get(api,
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = response.data;
+      List<Image2> fetchedProducts =
+          data.map((json) => Image2.fromJson(json)).toList();
+      Images.addAll(fetchedProducts);
+      print('hinh_________${response.data}');
+    } else {
+      throw Exception('Failed to load user data');
+    }
+    return Images.cast<Image2>();
+  }
+
   Future<bool> isAuthenticated() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('token');
@@ -291,7 +315,7 @@ class _MainScreenState extends State<HomeScreen> {
                         ),
                         InkWell(
                           child: Text(
-                            "Bạn đang tìm kiếm gì?",
+                            "Search....?",
                             style: TextStyle(color: Colors.black),
                           ),
                           onTap: () {
@@ -518,7 +542,6 @@ class _MainScreenState extends State<HomeScreen> {
                   )
                 ],
               ),
-              
             ),
             body: SingleChildScrollView(
               child: Column(
@@ -555,65 +578,110 @@ class _MainScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 10),
                   FutureBuilder<List<Products>>(
-                    future: futureProduct,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Text('No products available');
-                      } else {
-                        return GridView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.7,
-                          ),
-                          itemCount: snapshot.data!.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ProductDetail(
-                                              id_sp:
-                                                  snapshot.data![index].id_sp,
-                                            )));
-                              },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(0.0),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Container(
-                                          height: 170,
-                                          width: 230,
-                                          child: Image.asset(
-                                            'assets/hinh.jpg',
-                                            fit: BoxFit.cover,
-                                          ),
+                      future: futureProduct,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Text('No products available');
+                        } else {
+                          return FutureBuilder<List<Image2>>(
+                            future: futureImage2,
+                            builder: (context, SnapshotImage) {
+                              if (SnapshotImage.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              } else if (SnapshotImage.hasError) {
+                                return Center(
+                                    child:
+                                        Text('Error: ${SnapshotImage.error}'));
+                              } else if (!SnapshotImage.hasData ||
+                                  SnapshotImage.data!.isEmpty) {
+                                return Center(
+                                    child: Text('No variations found'));
+                              } else {
+                                return GridView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: 0.7,
+                                  ),
+                                  itemCount: snapshot.data!.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                   List<Image2> productImages = SnapshotImage.data!
+                                .where((img) =>
+                                    img.id_sp == snapshot.data![index].id_sp)
+                                .toList();
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProductDetail(
+                                                      id_sp: snapshot
+                                                          .data![index].id_sp,
+                                                    )));
+                                      },
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(0.0),
                                         ),
-                                        SizedBox(height: 20,),
-                                        Text(snapshot.data![index].ten ?? ''),
-                                        Text(snapshot.data![index].gia ?? ''),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
-                  ),
+                                        child: Column(
+                                          children: [
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  height: 170,
+                                                  width: 230,
+                                                  child: productImages
+                                                          .isNotEmpty
+                                                      ? PageView.builder(
+                                                          itemCount:
+                                                              productImages
+                                                                  .length,
+                                                          itemBuilder: (context,
+                                                              imgIndex) {
+                                                            return Container(
+                                                                decoration: BoxDecoration(
+                                                                    image: DecorationImage(
+                                                                        image: NetworkImage(
+                                                              '${productImages[imgIndex].image}',
+                                                            ))));
+                                                          },
+                                                        )
+                                                      : Placeholder(), // Placeholder or ErrorWidget if image is not available
+                                                ),
+                                                SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Text(
+                                                    snapshot.data![index].ten ??
+                                                        ''),
+                                                Text(
+                                                    snapshot.data![index].gia ??
+                                                        ''),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                          );
+                        }
+                      })
                 ],
               ),
             )),

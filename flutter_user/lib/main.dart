@@ -16,6 +16,7 @@ import 'models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_user/models/category.dart';
 import 'view/cardDetailOrder.dart';
+import 'view/paymentScreen.dart';
 import 'view/registerScreen.dart';
 import 'view/thongbao.dart';
 import 'view/listCardProductOrder.dart';

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_user/models/product.dart';
+import 'package:flutter_user/view/cartScreen.dart';
 import 'package:flutter_user/view/productDetail.dart';
 import '../methods/api.dart';
 
@@ -121,7 +122,7 @@ class _HomescreenState extends State<Homescreen> {
                     ),
                     InkWell(
                       child: Text(
-                        "Bạn đang tìm kiếm gì?",
+                        "Search ?",
                         style: TextStyle(color: Colors.black),
                       ),
                       onTap: () {
@@ -139,11 +140,12 @@ class _HomescreenState extends State<Homescreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.shopping_cart),
-                    onPressed: () async {},
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.chat_sharp),
-                    onPressed: () {},
+                    onPressed: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CartScreen()));
+                    },
                   ),
                 ],
               )
@@ -213,6 +215,8 @@ class _HomescreenState extends State<Homescreen> {
                                 MaterialPageRoute(
                                     builder: (context) => ProductDetail(
                                           id_sp: snapshot.data![index].id_sp,
+                                          gia: snapshot.data![index].gia ?? '',
+                                          tensp: snapshot.data![index].ten,
                                         )));
                           },
                           child: Card(
@@ -230,9 +234,21 @@ class _HomescreenState extends State<Homescreen> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                SizedBox(height: 10,),
-                                 Text(snapshot.data![index].ten ?? '',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                                 Text(snapshot.data![index].gia ?? '',style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),)
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  snapshot.data![index].ten ?? '',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  snapshot.data![index].gia ?? '',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                )
                               ],
                             ),
                           ),

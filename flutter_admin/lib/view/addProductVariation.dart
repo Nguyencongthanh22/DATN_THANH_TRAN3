@@ -261,7 +261,7 @@ class _AddProductState extends State<AddProductVariation> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddCardProduct(id_sp: idproduct),
+                    builder: (context) => AddCardProduct(id_sp: idproduct,),
                   ),
                 );
               },

@@ -1,262 +1,21 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_user/view/numberUpDown.dart';
-// import 'package:flutter_user/view/cardProducReview.dart';
+import 'dart:convert';
 
-// class ProductDetail extends StatefulWidget {
-//   const ProductDetail({Key? key, required this.id_sp}) : super(key: key);
-//   final int? id_sp;
-//   // final String? mota;
-//   //final
-//   @override
-//   State<ProductDetail> createState() => _ProductDetailState();
-// }
-
-// class _ProductDetailState extends State<ProductDetail> {
-//   late List<RadioButtonModel> radioOptionsColor;
-//   late List<RadioButtonModel> radioOptionsSize;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     radioOptionsColor = [
-//       RadioButtonModel(isSelected: false, buttonText: 'Vàng'),
-//       RadioButtonModel(isSelected: false, buttonText: 'Hồng'),
-//       RadioButtonModel(isSelected: false, buttonText: 'Đen'),
-//       RadioButtonModel(isSelected: false, buttonText: 'Trắng'),
-//     ];
-//     radioOptionsSize = [
-//       RadioButtonModel(isSelected: false, buttonText: 'S'),
-//       RadioButtonModel(isSelected: false, buttonText: 'M'),
-//       RadioButtonModel(isSelected: false, buttonText: 'L'),
-//       RadioButtonModel(isSelected: false, buttonText: 'XL'),
-//     ];
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         leading: IconButton(
-//             onPressed: () => Navigator.pop(context),
-//             icon: const Icon(
-//               Icons.arrow_back,
-//               color: Colors.red,
-//             )),
-//         title: Text('Product Detail'),
-//         actions: [
-//           IconButton(
-//             onPressed: () {},
-//             icon: Icon(
-//               Icons.shopping_cart_outlined,
-//               color: Colors.red,
-//             ),
-//           ),
-//         ],
-//       ),
-//       body: SingleChildScrollView(
-//         padding: EdgeInsets.all(16),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               "Tên sản phẩm",
-//               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//             ),
-//             SizedBox(height: 8),
-//             Text("5/5", style: TextStyle(fontSize: 18)),
-//             SizedBox(height: 8),
-//             Container(
-//               height: 250,
-//               width: double.infinity,
-//               child: Placeholder(), // Thay bằng hình ảnh thực tế của sản phẩm
-//             ),
-//             SizedBox(height: 16),
-//             Text("Màu sắc", style: TextStyle(fontSize: 18)),
-//             SizedBox(height: 8),
-//             Row(
-//               children: [
-//                 for (var option in radioOptionsColor)
-//                   GestureDetector(
-//                     onTap: () {
-//                       setState(() {
-//                         print('Selected color: ${option.isSelected}');
-//                         for (var other in radioOptionsColor) {
-//                           if (other != option) {
-//                             other.isSelected = false;
-//                           }
-//                         }
-//                         print('Selected color: ${option.buttonText}');
-//                         option.isSelected = !option.isSelected;
-//                         print('Selected color: ${option.isSelected}');
-//                       });
-//                     },
-//                     child: SquareRadioButtonItem(option),
-//                   ),
-//               ],
-//             ),
-//             SizedBox(height: 16),
-//             Text("Kích cỡ", style: TextStyle(fontSize: 18)),
-//             Row(
-//               children: [
-//                 for (var option in radioOptionsSize)
-//                   GestureDetector(
-//                     onTap: () {
-//                       setState(() {
-//                         print('Selected color: ${option.isSelected}');
-//                         for (var other in radioOptionsSize) {
-//                           if (other != option) {
-//                             other.isSelected = false;
-//                           }
-//                         }
-//                         print('Selected color: ${option.isSelected}');
-//                         print('Selected color: ${option.buttonText}');
-//                         option.isSelected = !option.isSelected;
-//                       });
-//                     },
-//                     child: SquareRadioButtonItem(option),
-//                   ),
-//               ],
-//             ),
-//             SizedBox(height: 8),
-//             Text("Số lượng", style: TextStyle(fontSize: 18)),
-//             Container(
-//               margin: EdgeInsets.all(15),
-//               height: 50,
-//               width: 200,
-//               child: NumberUpDown(onChanged: (int) {}),
-//             ),
-//             SizedBox(height: 15),
-//             Text("283.000 VND",
-//                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-//             SizedBox(height: 25),
-//             Text("Mô tả",
-//                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//             Text(
-//                 "Các phần lưới được ánh xạ (đan vào vải) chứ không phải khâu lại với nhau đảm bảo cảm giác êm ái, nhẹ nhàng.",
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 )),
-//             SizedBox(height: 30),
-//             Text("Đánh giá",
-//                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//             Container(
-//                 margin: EdgeInsets.all(10),
-//                 height: 300,
-//                 width: double.infinity,
-//                 child: CardReview())
-//           ],
-//         ),
-//       ),
-//       bottomNavigationBar: BottomAppBar(
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceAround,
-//           children: [
-//             Expanded(
-//               child: MaterialButton(
-//                 color: Colors.red[400],
-//                 onPressed: () {
-//                   // Xử lý khi nhấn vào Thêm giỏ hàng
-//                 },
-//                 child: Container(
-//                   alignment: Alignment.center,
-//                   height: 70,
-//                   child: const Column(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Icon(Icons.shopping_cart_outlined, color: Colors.white),
-//                       Padding(
-//                         padding: EdgeInsets.only(top: 5.0),
-//                         // child: Text('Thêm giỏ hàng'),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             SizedBox(width: 16), // Khoảng cách giữa hai button
-//             Expanded(
-//               child: MaterialButton(
-//                 color: Colors.red[400],
-//                 onPressed: () {
-//                   // Xử lý khi nhấn vào Mua ngay
-//                 },
-//                 child: Container(
-//                   alignment: Alignment.center,
-//                   height: 70,
-//                   child: const Text(
-//                     'Mua ngay',
-//                     style: TextStyle(color: Colors.white, fontSize: 20),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class RadioButtonModel {
-//   late bool isSelected;
-//   final String buttonText;
-
-//   RadioButtonModel({
-//     required this.isSelected,
-//     required this.buttonText,
-//   });
-// }
-
-// class SquareRadioButtonItem extends StatelessWidget {
-//   final RadioButtonModel _item;
-
-//   const SquareRadioButtonItem(this._item, {Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       margin: const EdgeInsets.all(15.0),
-//       child: Row(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Container(
-//             height: 50.0,
-//             width: 50.0,
-//             child: Center(
-//               child: Text(
-//                 _item.buttonText,
-//                 style: TextStyle(
-//                   color: _item.isSelected ? Colors.white : Colors.black,
-//                   fontSize: 18.0,
-//                 ),
-//               ),
-//             ),
-//             decoration: BoxDecoration(
-//               color: _item.isSelected ? Colors.red[200] : Colors.transparent,
-//               border: Border.all(
-//                 width: 1.0,
-//                 color: _item.isSelected ? Colors.red : Colors.black,
-//               ),
-//               borderRadius: const BorderRadius.all(Radius.circular(2.0)),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_user/models/ProductVaritication.dart';
 import 'package:flutter_user/models/product.dart';
+import 'package:flutter_user/view/homescreen.dart';
 import 'package:flutter_user/view/numberUpDown.dart';
 import 'package:flutter_user/view/cardProducReview.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../methods/api.dart';
 
 class ProductDetail extends StatefulWidget {
-  const ProductDetail({Key? key, required this.id_sp}) : super(key: key);
+  const ProductDetail({Key? key, required this.id_sp, this.gia, this.tensp})
+      : super(key: key);
   final int? id_sp;
+  final String? gia;
+  final String? tensp;
 
   @override
   State<ProductDetail> createState() => _ProductDetailState();
@@ -265,9 +24,11 @@ class ProductDetail extends StatefulWidget {
 class _ProductDetailState extends State<ProductDetail> {
   late Future<List<Product>> productdetail;
   late Future<List<Producvaritation>> productVariations;
+  late Future<String?> futureEmail;
   List<Product> pro = [];
   List<Producvaritation> vari = [];
-
+  String? email;
+  int? soluong2;
   bool isLoading = false;
   Dio dio = Dio();
 
@@ -277,7 +38,8 @@ class _ProductDetailState extends State<ProductDetail> {
     productdetail = fetchData();
     productVariations = fetchVariations();
     radioOptionsColor = getUniqueColors(vari);
-     radioOptionsSize = getUniqueSizes(vari);
+    radioOptionsSize = getUniqueSizes(vari);
+    futureEmail = getUserEmail();
   }
 
   Future<List<Product>> fetchData() async {
@@ -315,7 +77,7 @@ class _ProductDetailState extends State<ProductDetail> {
     return pro;
   }
 
- Future<List<Producvaritation>> fetchVariations() async {
+  Future<List<Producvaritation>> fetchVariations() async {
     try {
       String api2 = API().getUrl('/getProductVaritication');
       final response2 = await dio.get(
@@ -343,22 +105,62 @@ class _ProductDetailState extends State<ProductDetail> {
   }
 
   List<RadioButtonModel> getUniqueColors(List<Producvaritation> variations) {
-    final seen = <int>{};
-    return variations.where((v) => seen.add(v.id_color!)).map((v) {
+    final seenColors = <String>{};
+    return variations.where((v) {
+      // Filter out duplicates
+      return seenColors.add(v.name_color ?? '');
+    }).map((v) {
+      // Map to RadioButtonModel
       return RadioButtonModel(
-        // isSelected: false, // Default to false if null or not provided
+        isSelected: false,
         buttonText: v.name_color ?? '',
       );
     }).toList();
   }
 
+  Future<String?> getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    email = preferences.getString('email');
+    print('_________________${email}');
+    return email;
+  }
+
+  String? selectedColor;
+  String? selectedSize;
   List<RadioButtonModel> getUniqueSizes(List<Producvaritation> variations) {
-    final seen = <int>{};
-    return variations.where((v) => seen.add(v.id_size!)).map((v) {
+    final seenSizes = <String>{};
+    return variations.where((v) {
+      // Filter out duplicates
+      return seenSizes.add(v.Ten_size ?? '');
+    }).map((v) {
+      // Map to RadioButtonModel
       return RadioButtonModel(
+        isSelected: false,
         buttonText: v.Ten_size ?? '',
       );
     }).toList();
+  }
+
+  void addproduct() async {
+    final data = {
+      'id_sp': widget.id_sp,
+      'soluong': soluong2,
+      'tensp':widget.tensp,
+      'ten_color': selectedColor,
+      'gia': double.parse(widget.gia ?? ''),
+      'ten_size': selectedSize,
+      'email': email,
+    };
+    print('________${widget.gia}');
+    final result = await API().postRequset2(route: '/AddCart', data: data);
+    final response = jsonDecode(result.body);
+    print('Response: $response');
+    if (response['status'] == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Đơn hàng đã được thêm vào giỏ hàng')));
+    } else {
+      print('Error________________: ${response['message']}');
+    }
   }
 
   List<RadioButtonModel> radioOptionsColor = [];
@@ -408,7 +210,6 @@ class _ProductDetailState extends State<ProductDetail> {
                   return Center(child: Text('No variations found'));
                 } else {
                   vari = variSnapshot.data!;
-                  
 
                   return SingleChildScrollView(
                     padding: EdgeInsets.all(16),
@@ -438,17 +239,13 @@ class _ProductDetailState extends State<ProductDetail> {
                             for (var option in radioOptionsColor)
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {});
-                                  print('Selected color: ${option.isSelected}');
-                                  for (var other in radioOptionsColor) {
-                                    if (other != option) {
+                                  setState(() {
+                                    for (var other in radioOptionsColor) {
                                       other.isSelected = false;
                                     }
-                                  }
-                                  option.isSelected = true;
-                                  
-                                  print('Selected color: ${option.buttonText}');
-                                  print('Selected color: ${option.isSelected}');
+                                    option.isSelected = true;
+                                    selectedColor = option.buttonText;
+                                  });
                                 },
                                 child: SquareRadioButtonItem(option),
                               ),
@@ -462,7 +259,11 @@ class _ProductDetailState extends State<ProductDetail> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    option.isSelected = !option.isSelected;
+                                    for (var other in radioOptionsSize) {
+                                      other.isSelected = false;
+                                    }
+                                    option.isSelected = true;
+                                    selectedSize = option.buttonText;
                                   });
                                 },
                                 child: SquareRadioButtonItem(option),
@@ -474,8 +275,12 @@ class _ProductDetailState extends State<ProductDetail> {
                         Container(
                           margin: EdgeInsets.all(15),
                           height: 50,
-                          width: 200,
-                          child: NumberUpDown(onChanged: (int) {}),
+                          width: 150,
+                          child: NumberUpDown(onChanged: (value) {
+                            setState(() {
+                              soluong2 = value;
+                            });
+                          }),
                         ),
                         SizedBox(height: 35),
                         Text(
@@ -531,23 +336,25 @@ class _ProductDetailState extends State<ProductDetail> {
               child: MaterialButton(
                 color: Colors.red[400],
                 onPressed: () {
-                  // Handle add to cart
+                  addproduct();
                 },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 70,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.shopping_cart_outlined, color: Colors.white),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0),
-                        child: Text(
-                          'Thêm giỏ hàng',
-                          style: TextStyle(color: Colors.white),
+                child: InkWell(
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 70,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.shopping_cart_outlined, color: Colors.white),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0),
+                          child: Text(
+                            'Thêm giỏ hàng',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -581,7 +388,7 @@ class RadioButtonModel {
   final String buttonText;
 
   RadioButtonModel({
-    //required this.isSelected,
+    required this.isSelected,
     required this.buttonText,
   });
 }

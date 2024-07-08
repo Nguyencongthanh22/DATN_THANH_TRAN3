@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../Method/api.dart';
 import '../models/ProductVaritation.dart';
+import 'image.dart';
 
 class ProductCard extends StatefulWidget {
   final String? color;
   final String? size;
-  final int? quantity;
+  final int? quantity; // Thêm callback để truyền ảnh đã chọn
 
   ProductCard({
     required this.color,
@@ -21,17 +22,17 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  File? _image;
+  // File? _image;
 
-  Future<void> _pickImage() async {
-    final chosenFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (chosenFile != null) {
-        _image = File(chosenFile.path);
-      }
-    });
-  }
+  // Future<void> _pickImage() async {
+  //   final chosenFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if (chosenFile != null) {
+  //     setState(() {
+  //       _image = File(chosenFile.path);
+  //     });
+  //     widget.onImageSelected(_image!); // Truyền ảnh đã chọn ra ngoài
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -45,22 +46,21 @@ class _ProductCardState extends State<ProductCard> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: _image != null
-                  ? Image.file(
-                      _image!,
-                      height: 100,
-                      width: 100,
-                      fit: BoxFit.cover,
-                    )
-                  : Icon(Icons.image, size: 100),
-            ),
+            // GestureDetector(
+            //   onTap: _pickImage,
+            //   child: _image != null
+            //       ? Image.file(
+            //           _image!,
+            //           height: 100,
+            //           width: 100,
+            //           fit: BoxFit.cover,
+            //         )
+            //       : Icon(Icons.image, size: 100),
+            // ),
             SizedBox(height: 10),
             Text('Color: ${widget.color}', style: TextStyle(fontSize: 16)),
             Text('Size: ${widget.size}', style: TextStyle(fontSize: 16)),
-            Text('Quantity: ${widget.quantity}',
-                style: TextStyle(fontSize: 16)),
+            Text('Quantity: ${widget.quantity}', style: TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -70,7 +70,6 @@ class _ProductCardState extends State<ProductCard> {
 
 class AddCardProduct extends StatefulWidget {
   final int? id_sp;
-
   const AddCardProduct({Key? key, this.id_sp}) : super(key: key);
 
   @override
@@ -107,8 +106,7 @@ class _AddCardProductState extends State<AddCardProduct> {
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         for (var item in data) {
-          Producvaritation productVariationItem =
-              Producvaritation.fromJson(item);
+          Producvaritation productVariationItem = Producvaritation.fromJson(item);
           productVariations.add(productVariationItem);
         }
       } else {
@@ -120,6 +118,30 @@ class _AddCardProductState extends State<AddCardProduct> {
 
     print('Product Variations: ${productVariations}');
     return productVariations;
+  }
+
+  Future<void> uploadImage(File image, int? id_colors) async {
+    try {
+      String apiUrl = API().getUrl('/uploadImage');
+      String fileName = image.path.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(image.path, filename: fileName),
+        'id_sp': widget.id_sp,
+        'id_color': id_colors,
+      });
+
+      final response = await dio.post(apiUrl, data: formData);
+
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+      } else {
+        print('Failed to upload image. Server responded with status code: ${response.statusCode}');
+        print('Response body: ${response.data}');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
+    }
   }
 
   @override
@@ -156,10 +178,14 @@ class _AddCardProductState extends State<AddCardProduct> {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      return ProductCard(
-                        color: snapshot.data![index].Ten_size,
-                        size: snapshot.data![index].name_color,
-                        quantity: snapshot.data![index].so_luong,
+                      return InkWell(
+                        onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageUploader(productId:widget.id_sp ,colorId: snapshot.data![index].id_color,)));},
+                        child: ProductCard(
+                          color: snapshot.data![index].Ten_size,
+                          size: snapshot.data![index].name_color,
+                          quantity: snapshot.data![index].so_luong,
+                         
+                        ),
                       );
                     },
                   );
@@ -169,8 +195,12 @@ class _AddCardProductState extends State<AddCardProduct> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddCardProduct()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddCardProduct(id_sp: widget.id_sp),
+                ),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],

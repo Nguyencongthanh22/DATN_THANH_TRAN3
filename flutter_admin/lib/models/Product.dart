@@ -6,7 +6,6 @@ class Products {
   String? mota;
   String? gia;
   int? id_danhmuc;
- // int? trangthai;
   String id_email;
   Products({
     required this.id_sp,
@@ -14,7 +13,6 @@ class Products {
     required this.mota,
     required this.gia,
     required this.id_danhmuc,
-    //required this.trangthai,
     required this.id_email
   });
   factory Products.fromJson(Map<String, dynamic> json) {
@@ -24,7 +22,6 @@ class Products {
       mota: json['mota'],
       gia: json['gia'],
       id_danhmuc: json['id_danhmuc'] ?? '',
-   //   trangthai: json['trangthai'] ?? '',
       id_email: json['id_email']
     );
   }

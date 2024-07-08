@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class API {
   late String url;
-  String uri = 'https://ae0f-113-185-78-110.ngrok-free.app/api';
+  String uri = 'https://fa08-1-53-27-195.ngrok-free.app/api';
   Dio dio = Dio();
   postRequset({
     required String route,
@@ -20,11 +20,24 @@ class API {
         'Content-type': 'application/json',
         'Accept': 'application/json',
       };
+postRequset2({
+    required String route,
+    required Map< String,Object?> data,
+  }) async {
+    url = uri + route;
+    return await http.post(Uri.parse(url),
+        body: jsonEncode(data), headers: _header());
+  }
 
-
+  _header2() => {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+      };
   getUrl(
     String route,
   ) {
     return url = uri + route;
   }
 }
+
+
