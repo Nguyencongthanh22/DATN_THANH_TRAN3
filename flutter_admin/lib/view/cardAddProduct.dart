@@ -1,72 +1,10 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/view/homeScreen.dart';
 import 'package:image_picker/image_picker.dart';
 import '../Method/api.dart';
 import '../models/ProductVaritation.dart';
-import 'image.dart';
-
-class ProductCard extends StatefulWidget {
-  final String? color;
-  final String? size;
-  final int? quantity; // Thêm callback để truyền ảnh đã chọn
-
-  ProductCard({
-    required this.color,
-    required this.size,
-    required this.quantity,
-  });
-
-  @override
-  State<ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<ProductCard> {
-  // File? _image;
-
-  // Future<void> _pickImage() async {
-  //   final chosenFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-  //   if (chosenFile != null) {
-  //     setState(() {
-  //       _image = File(chosenFile.path);
-  //     });
-  //     widget.onImageSelected(_image!); // Truyền ảnh đã chọn ra ngoài
-  //   }
-  // }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-        side: BorderSide(color: Color.fromARGB(255, 248, 128, 120), width: 1.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            // GestureDetector(
-            //   onTap: _pickImage,
-            //   child: _image != null
-            //       ? Image.file(
-            //           _image!,
-            //           height: 100,
-            //           width: 100,
-            //           fit: BoxFit.cover,
-            //         )
-            //       : Icon(Icons.image, size: 100),
-            // ),
-            SizedBox(height: 10),
-            Text('Color: ${widget.color}', style: TextStyle(fontSize: 16)),
-            Text('Size: ${widget.size}', style: TextStyle(fontSize: 16)),
-            Text('Quantity: ${widget.quantity}', style: TextStyle(fontSize: 16)),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class AddCardProduct extends StatefulWidget {
   final int? id_sp;
@@ -85,6 +23,17 @@ class _AddCardProductState extends State<AddCardProduct> {
   void initState() {
     super.initState();
     futureProduct = fetchData();
+  }
+
+  File? _image;
+  final picker = ImagePicker();
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
   }
 
   Future<List<Producvaritation>> fetchData() async {
@@ -106,7 +55,8 @@ class _AddCardProductState extends State<AddCardProduct> {
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         for (var item in data) {
-          Producvaritation productVariationItem = Producvaritation.fromJson(item);
+          Producvaritation productVariationItem =
+              Producvaritation.fromJson(item);
           productVariations.add(productVariationItem);
         }
       } else {
@@ -120,27 +70,53 @@ class _AddCardProductState extends State<AddCardProduct> {
     return productVariations;
   }
 
-  Future<void> uploadImage(File image, int? id_colors) async {
+  Future<void> _uploadImage(int colorId) async {
+    if (_image == null) return;
+
+    String apiUrl =
+        API().getUrl('/uploadImage'); // Replace with your Laravel API endpoint
+    String fileName = _image!.path.split('/').last;
+
+    FormData formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(_image!.path, filename: fileName),
+      'id_sp': widget.id_sp,
+      'id_color': colorId,
+    });
+
     try {
-      String apiUrl = API().getUrl('/uploadImage');
-      String fileName = image.path.split('/').last;
-
-      FormData formData = FormData.fromMap({
-        'image': await MultipartFile.fromFile(image.path, filename: fileName),
-        'id_sp': widget.id_sp,
-        'id_color': id_colors,
-      });
-
-      final response = await dio.post(apiUrl, data: formData);
+      Response response = await dio.post(
+        apiUrl,
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
 
       if (response.statusCode == 200) {
         print('Image uploaded successfully');
+        
+      }
+      
+      else if  (response.statusCode == 420) {
+        
       } else {
-        print('Failed to upload image. Server responded with status code: ${response.statusCode}');
-        print('Response body: ${response.data}');
+        print(
+            'Failed to upload image: ${response.statusCode} ${response.statusMessage}');
       }
     } catch (e) {
-      print('Error uploading image: $e');
+      if (e is DioError) {
+        print('Dio error: ${e.message}');
+        if (e.response != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Màu sản phẩm đã được thêm hình ảnh trước đó')));
+          print('Error response: ${e.response}');
+        }
+      } else {
+        print('Unexpected error: $e');
+      }
     }
   }
 
@@ -179,13 +155,43 @@ class _AddCardProductState extends State<AddCardProduct> {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       return InkWell(
-                        onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>ImageUploader(productId:widget.id_sp ,colorId: snapshot.data![index].id_color,)));},
-                        child: ProductCard(
-                          color: snapshot.data![index].Ten_size,
-                          size: snapshot.data![index].name_color,
-                          quantity: snapshot.data![index].so_luong,
-                         
+                        child: Card(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            side: BorderSide(
+                                color: Color.fromARGB(255, 248, 128, 120),
+                                width: 1.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(children: [
+                              GestureDetector(
+                                onTap: _pickImage,
+                                
+                                child: _image != null
+                                    ? Image.file(
+                                        _image!,
+                                        height: 100,
+                                        width: 100,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Icon(Icons.image, size: 100),
+                              ),
+                              SizedBox(height: 10),
+                              Text('Color: ${snapshot.data![index].Ten_size}',
+                                  style: TextStyle(fontSize: 16)),
+                              Text('Size: ${snapshot.data![index].name_color}',
+                                  style: TextStyle(fontSize: 16)),
+                              Text(
+                                  'Quantity: ${snapshot.data![index].so_luong}',
+                                  style: TextStyle(fontSize: 16)),
+                            ]),
+                          ),
                         ),
+                        onTap: () {
+                          _uploadImage(snapshot.data![index].id_color ?? 0);
+                        },
                       );
                     },
                   );
@@ -198,7 +204,7 @@ class _AddCardProductState extends State<AddCardProduct> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddCardProduct(id_sp: widget.id_sp),
+                  builder: (context) => HomeScreen(),
                 ),
               );
             },

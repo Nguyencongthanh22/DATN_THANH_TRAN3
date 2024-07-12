@@ -42,7 +42,7 @@ class _EditProductState extends State<EditProduct> {
         pros = Products.fromJson(jsonDecode(jsonEncode(response.data)));
         tenspcontroller.text = pros!.ten ?? '';
         motacontroller.text = pros!.mota ?? '';
-        giacontroller.text = pros!.gia ?? '';
+        giacontroller.text = '${pros!.gia}';
       });
     });
   }
@@ -118,7 +118,9 @@ class _EditProductState extends State<EditProduct> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditProductVariation(id_sp: widget.id_sp,),
+                  builder: (context) => EditProductVariation(
+                    id_sp: widget.id_sp,
+                  ),
                 ),
               );
               // //           controller.loginUser(context);

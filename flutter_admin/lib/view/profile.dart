@@ -10,9 +10,9 @@ import '../models/user.dart';
 import 'package:intl/intl.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({super.key, required this.token, required this.email});
-  final String token;
-  final String email;
+  const Profile({
+    super.key,
+  });
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -21,6 +21,7 @@ class Profile extends StatefulWidget {
 List<String> _suggestions = [];
 late Future<int?> futureQuyen;
 late Future<void> update;
+late Future<String?> futureEmail;
 
 class _ProfileState extends State<Profile> {
   TextEditingController _nameController = TextEditingController();
@@ -28,13 +29,14 @@ class _ProfileState extends State<Profile> {
   TextEditingController _addressController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _ngaySinhController = TextEditingController();
+
   DateTime? ngaysinh;
   String? Gender;
   int? Quyen1;
   String test = '';
   User? user;
   Dio dio = Dio();
-
+  String? email;
   String dropdownValueNam = '1';
   String namegender = 'Nam';
   Map<String, String> GenderValueMap = {
@@ -43,36 +45,56 @@ class _ProfileState extends State<Profile> {
     '3': 'Khác',
   };
 
+  Future<String?> getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    email = preferences.getString('email');
+    print('___________${email}');
+    return email;
+  }
+
   String dropdownValueQuyen = '0';
+  @override
   @override
   void initState() {
     super.initState();
     //  service = AuthService();
     futureQuyen = getUserQuyen();
+    futureEmail = getUserEmail();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Map<String, dynamic> formData = {
-        "email": widget.email,
-      };
-      String api = API().getUrl('/profileAdmin');
-      final response = await dio.get(api,
-          data: formData,
-          options: Options(
-            headers: {
-              'Accept': 'application/json',
-            },
-          ));
-      print('Lấy data profile: ${response.data}');
-      setState(() {
-        user = User.fromJson(jsonDecode(jsonEncode(response.data)));
-        _nameController.text = user!.name ?? '';
-        //  _emailController.text = user!.email ?? '';
-        _addressController.text = user!.diachi ?? '';
-        _phoneController.text = user!.sodienthoai ?? '';
-        Gender = user!.gioitinh ?? '';
-        Quyen1 = user!.quyen;
-      
-      });
+      email = await futureEmail;
+      if (email != null) {
+        Map<String, dynamic> formData = {
+          "email": email,
+        };
+        String api = API().getUrl('/profileAdmin');
+        final response = await dio.get(api,
+            data: formData,
+            options: Options(
+              headers: {
+                'Accept': 'application/json',
+              },
+            ));
+        print('Lấy data profile: ${response.data}');
+        setState(() {
+          user = User.fromJson(jsonDecode(jsonEncode(response.data)));
+          _nameController.text = user!.name ?? '';
+          _addressController.text = user!.diachi ?? '';
+          _phoneController.text = user!.sodienthoai ?? '';
+          Gender = user!.gioitinh ?? '';
+          Quyen1 = user!.quyen;
+          ngaysinh = user!.ngaysinh;
+        });
+      } else {}
     });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    _phoneController.dispose();
+    _ngaySinhController.dispose();
+    super.dispose();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -96,7 +118,7 @@ class _ProfileState extends State<Profile> {
       final response = await Dio().put(
         api,
         data: {
-          'email': widget.email,
+          'email': email,
           'name': _nameController.text,
           'diachi': _addressController.text,
           'sodienthoai': _phoneController.text,
@@ -155,7 +177,7 @@ class _ProfileState extends State<Profile> {
                 children: [
                   // Padding(padding: EdgeInsets.all(10)),
                   Text(
-                    'TÀI KHOẢN: ' + widget.email,
+                    'TÀI KHOẢN: ${email}',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -263,7 +285,7 @@ class _ProfileState extends State<Profile> {
                   ),
 
                   Text(
-                    "NGÀY SINH",
+                    "NGÀY SINH ${ngaysinh}",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5),

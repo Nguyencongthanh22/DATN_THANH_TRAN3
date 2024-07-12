@@ -139,4 +139,6 @@ class Product {
       required this.imageUrl,
       required this.price,
       required this.rate});
+
+  static fromJson(json) {}
 }

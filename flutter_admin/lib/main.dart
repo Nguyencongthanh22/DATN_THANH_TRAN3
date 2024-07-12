@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin/view/loginScreen.dart';
+import 'package:flutter_admin/view/profile.dart';
 import 'package:flutter_admin/view/registerScreen.dart';
+import 'view/accout.dart';
+import 'view/addPromotion.dart';
+import 'view/cardAddProduct.dart';
+import 'view/chart.dart';
 import 'view/homeScreen.dart';
+import 'view/listCardProductOrder.dart';
 import 'view/productDetail.dart';
 import 'view/numberUpDown.dart';
 import 'view/cardProducReview.dart';
@@ -12,6 +18,7 @@ import 'view/listUserInfo.dart';
 import 'view/listStaffInfo.dart';
 import 'view/detailUserInfo.dart';
 import 'view/detailStaffInfo.dart';
+import 'view/promotionScreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -44,7 +51,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: customTheme, 
       debugShowCheckedModeBanner: false,
-      home:HomeScreen(),
+      home:SparkBarChartExample(),
     );
   }
 }

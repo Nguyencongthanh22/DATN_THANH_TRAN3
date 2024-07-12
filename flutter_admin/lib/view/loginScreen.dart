@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/material/icons.dart';
+import 'package:flutter_admin/view/accout.dart';
 import 'package:flutter_admin/view/homeScreen.dart';
 import 'package:flutter_admin/view/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,11 +44,11 @@ class _LogInScreenState extends State<LogInScreen> {
         String token = response['token'];
         String email = response['user']['email'];
         int quyen = response['user']['quyen'];
-        // ScaffoldMessenger.of(context)
-        //     .showSnackBar(SnackBar(content: Text(response['message'])));
-        // print(object)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(response['message'])));
+       // print(object)
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Profile(token: token,email: email,)));
+            context, MaterialPageRoute(builder: (context) => HomeScreen()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${response['message']}')));

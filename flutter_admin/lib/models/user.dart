@@ -5,8 +5,9 @@ class User {
   String? gioitinh;
   String? sodienthoai;
   int? trangthai;
-   DateTime? ngaysinh;
+  DateTime? ngaysinh;
   int? quyen;
+  String? ngaytao;
   User(
       {required this.name,
       required this.email,
@@ -14,6 +15,7 @@ class User {
       required this.quyen,
       required this.gioitinh,
       required this.ngaysinh,
+      required this.ngaytao,
       required this.sodienthoai,
       required this.trangthai});
   Map<String, dynamic> tomap() {
@@ -23,12 +25,14 @@ class User {
       "diachi": diachi,
       "quyen": quyen,
       "gioitinh": gioitinh,
-      "ngaysinh":ngaysinh,
+      "ngaysinh": ngaysinh,
+     'ngaytao': ngaytao,
       "sodienthoai": sodienthoai,
-      'trangthai':trangthai,
+      'trangthai': trangthai,
     };
   }
-factory User.fromJson2(Map<String, dynamic> json) {
+
+  factory User.fromJson2(Map<String, dynamic> json) {
     return User(
       name: json['name'],
       email: json['email'],
@@ -36,6 +40,7 @@ factory User.fromJson2(Map<String, dynamic> json) {
       quyen: json['quyen'],
       ngaysinh: DateTime.parse(json['ngaysinh']),
       gioitinh: json['gioitinh'],
+      ngaytao: json['ngaytao'],
       sodienthoai: json['sodienthoai'],
       trangthai: json['trangthai'],
     );
@@ -49,17 +54,17 @@ factory User.fromJson2(Map<String, dynamic> json) {
         return null;
       }
     }
+
     return User(
         name: json['name'] ?? '',
         email: json['email'] ?? '',
         diachi: json['diachi'] ?? '',
         quyen: json['quyen'] ?? '',
-        ngaysinh: DateTime.parse(json['ngaysinh']??''),
+        ngaysinh: DateTime.parse(json['ngaysinh'] ?? ''),
         gioitinh: json['gioitinh'] ?? '',
         sodienthoai: json['sodienthoai'] ?? '',
-        trangthai: json['trangthai']?? ''
-        );
-        
+        ngaytao: json['ngaytao'],
+        trangthai: json['trangthai'] ?? '');
   }
 
   void addAll(List<User> fechdata) {}

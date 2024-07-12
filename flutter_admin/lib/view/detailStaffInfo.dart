@@ -21,7 +21,9 @@ class _DetailStaffInfoState extends State<DetailStaffInfo> {
     dataAdmin = getUser();
   }
 
-  List<User> user = [];
+  User? user;
+  // String? ngaytao;
+  //List<User> user = [];
   Dio dio = Dio();
   late Future<User> dataAdmin;
 
@@ -34,6 +36,10 @@ class _DetailStaffInfoState extends State<DetailStaffInfo> {
         ));
     if (response.statusCode == 200) {
       Map<String, dynamic> data = response.data;
+      setState(() {
+        user = User.fromJson(jsonDecode(jsonEncode(response.data)));
+      });
+      print('_____________${response.statusCode}');
       return User.fromJson(data);
     } else {
       throw Exception('Failed to load user data');
@@ -247,7 +253,7 @@ class _DetailStaffInfoState extends State<DetailStaffInfo> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Ngày vào làm: ',
+                                  'Ngày vào làm: ${user2.ngaytao}',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     color: Colors.black,

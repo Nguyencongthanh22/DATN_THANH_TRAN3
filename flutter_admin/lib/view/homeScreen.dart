@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/models/Coupon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
 import '../models/Category.dart';
@@ -27,6 +28,7 @@ class _MainScreenState extends State<HomeScreen> {
   late Future<String?> futureEmail;
   late Future<List<Products>> futureProduct;
   late Future<List<Image2>> futureImage2;
+  late Future<List<Coupon>> FutureCoupon;
   void initState() {
     super.initState();
     futureCategory = fetchData();
@@ -37,6 +39,31 @@ class _MainScreenState extends State<HomeScreen> {
     futureEmail = getUserEmail();
     futureProduct = fetchProduct2();
     futureImage2 = GetImage();
+    FutureCoupon = getCoupon();
+  }
+
+  Future<List<Products>> searchProducts(String query) async {
+    try {
+      String api = API().getUrl('/search');
+      final response = await dio.get(
+        api,
+        queryParameters: {'ten': query},
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((json) => Products.fromJson(json)).toList();
+      } else {
+        print('Error searching data: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error searching data: $e');
+      return [];
+    }
   }
 
   Dio dio = Dio();
@@ -81,6 +108,7 @@ class _MainScreenState extends State<HomeScreen> {
   int? quyen;
   List<Products?> products = [];
   List<Image2?> Images = [];
+  List<Coupon?> Coupons = [];
   bool isLoading = false;
 
   Future<List<Products>> fetchProduct2() async {
@@ -101,18 +129,16 @@ class _MainScreenState extends State<HomeScreen> {
       );
 
       if (response.statusCode == 200) {
-        List<dynamic> data = response.data;
-        List<Products> fetchedProducts =
-            data.map((json) => Products.fromJson(json)).toList();
-        products.addAll(fetchedProducts);
-        print('_________________${response.data}');
+        // Check if response.data is not null and is a List
+        if (response.data != null && response.data is List) {
+          List<dynamic> data = response.data as List;
+          products.addAll(data.map((json) => Products.fromJson(json)).toList());
+        } else {
+          print('Error: Invalid or empty data returned from API');
+        }
       } else {
         print('Error fetching data: ${response.statusCode}');
       }
-
-      setState(() {
-        isLoading = false;
-      });
     } catch (e) {
       print('Error fetching data: $e');
       setState(() {
@@ -262,6 +288,26 @@ class _MainScreenState extends State<HomeScreen> {
     return Images.cast<Image2>();
   }
 
+  Future<List<Coupon>> getCoupon() async {
+    String api = API().getUrl('/getCoupon');
+    final response = await dio.get(api,
+        queryParameters: {'trangthai': 1},
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = response.data;
+      List<Coupon> fetchedProducts =
+          data.map((json) => Coupon.fromJson(json)).toList();
+      Coupons.addAll(fetchedProducts);
+      print('coupon_________${response.data}');
+    } else {
+      throw Exception('Failed to load user data');
+    }
+    return Coupons.cast<Coupon>();
+  }
+
   Future<bool> isAuthenticated() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('token');
@@ -309,7 +355,7 @@ class _MainScreenState extends State<HomeScreen> {
                           onPressed: () {
                             showSearch(
                               context: context,
-                              delegate: CustomSearchDelegate(),
+                              delegate: CustomSearchDelegate(searchProducts),
                             );
                           },
                         ),
@@ -321,7 +367,7 @@ class _MainScreenState extends State<HomeScreen> {
                           onTap: () {
                             showSearch(
                               context: context,
-                              delegate: CustomSearchDelegate(),
+                              delegate: CustomSearchDelegate(searchProducts),
                             );
                           },
                         )
@@ -578,33 +624,50 @@ class _MainScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 10),
                   FutureBuilder<List<Products>>(
-                      future: futureProduct,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return Text('No products available');
-                        } else {
-                          return FutureBuilder<List<Image2>>(
-                            future: futureImage2,
-                            builder: (context, SnapshotImage) {
-                              if (SnapshotImage.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              } else if (SnapshotImage.hasError) {
-                                return Center(
-                                    child:
-                                        Text('Error: ${SnapshotImage.error}'));
-                              } else if (!SnapshotImage.hasData ||
-                                  SnapshotImage.data!.isEmpty) {
-                                return Center(
-                                    child: Text('No variations found'));
-                              } else {
+                    future: futureProduct,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text('No products available'));
+                      } else {
+                        // Use a FutureBuilder for coupons
+                        return FutureBuilder<List<Coupon>>(
+                          future: FutureCoupon,
+                          builder: (context, snapshotCoupon) {
+                            if (snapshotCoupon.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshotCoupon.hasError) {
+                              return Center(
+                                  child:
+                                      Text('Error: ${snapshotCoupon.error}'));
+                            }
+
+                            // Define a variable to hold coupon data, if available
+                            List<Coupon>? coupons = snapshotCoupon.data;
+
+                            // Use another FutureBuilder for product variations/images
+                            return FutureBuilder<List<Image2>>(
+                              future: futureImage2,
+                              builder: (context, snapshotImage) {
+                                if (snapshotImage.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshotImage.hasError) {
+                                  return Center(
+                                      child: Text(
+                                          'Error: ${snapshotImage.error}'));
+                                } else if (!snapshotImage.hasData ||
+                                    snapshotImage.data!.isEmpty) {
+                                  return Center(
+                                      child: Text('No variations found'));
+                                }
+
+                                // Build the GridView using product data and variations/images
                                 return GridView.builder(
                                   physics: const NeverScrollableScrollPhysics(),
                                   gridDelegate:
@@ -615,20 +678,60 @@ class _MainScreenState extends State<HomeScreen> {
                                   itemCount: snapshot.data!.length,
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
-                                   List<Image2> productImages = SnapshotImage.data!
-                                .where((img) =>
-                                    img.id_sp == snapshot.data![index].id_sp)
-                                .toList();
+                                    // Filter images/variations for the current product
+                                    List<Image2> productImages = snapshotImage
+                                        .data!
+                                        .where((img) =>
+                                            img.id_sp ==
+                                            snapshot.data![index].id_sp)
+                                        .toList();
+
+                                    // Calculate prices
+                                    double originalPrice = double.parse(
+                                        snapshot.data![index].gia ?? '0');
+                                    double discountedPrice = originalPrice;
+
+                                    // Check if coupons are available and apply discount if applicable
+                                    if (coupons != null && coupons.isNotEmpty) {
+                                      // Find the first matching coupon
+                                      Coupon? coupon = coupons.firstWhere(
+                                        (coupon) =>
+                                            coupon.id_danhmuc ==
+                                            snapshot.data![index].id_danhmuc,
+                                        orElse: () => Coupon(
+                                            tenct: '',
+                                            id: 0,
+                                            mota: '',
+                                            trangthai: 0,
+                                            id_danhmuc: 0,
+                                            phantram:
+                                                0), // Return a default Coupon object or handle the absence differently
+                                      );
+
+                                      // Apply discount if coupon is found
+                                      if (coupon.id_danhmuc != 0) {
+                                        // Assuming id_danhmuc of 0 indicates no coupon found
+                                        discountedPrice = originalPrice -
+                                            (originalPrice *
+                                                (coupon.phantram ?? 0) /
+                                                100);
+                                      }
+                                    }
+
+                                    // Build the product card
                                     return InkWell(
                                       onTap: () {
                                         Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProductDetail(
-                                                      id_sp: snapshot
-                                                          .data![index].id_sp,
-                                                    )));
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ProductDetail(
+                                              id_sp:snapshot.data![index].id_sp,
+                                              gia: double.parse( snapshot.data![index].gia!),
+                                              giakm: discountedPrice,
+                                              tensp: snapshot.data![index].ten,
+                                            ),
+                                          ),
+                                        );
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
@@ -637,51 +740,53 @@ class _MainScreenState extends State<HomeScreen> {
                                         ),
                                         child: Column(
                                           children: [
-                                            Column(
-                                              children: [
-                                                Container(
-                                                  height: 170,
-                                                  width: 230,
-                                                  child: productImages
-                                                          .isNotEmpty
-                                                      ? PageView.builder(
-                                                          itemCount:
-                                                              productImages
-                                                                  .length,
-                                                          itemBuilder: (context,
-                                                              imgIndex) {
-                                                            return Container(
-                                                                decoration: BoxDecoration(
-                                                                    image: DecorationImage(
-                                                                        image: NetworkImage(
-                                                              '${productImages[imgIndex].image}',
-                                                            ))));
-                                                          },
-                                                        )
-                                                      : Placeholder(), // Placeholder or ErrorWidget if image is not available
-                                                ),
-                                                SizedBox(
-                                                  height: 20,
-                                                ),
-                                                Text(
-                                                    snapshot.data![index].ten ??
-                                                        ''),
-                                                Text(
-                                                    snapshot.data![index].gia ??
-                                                        ''),
-                                              ],
+                                            Container(
+                                              height: 150,
+                                              width: 230,
+                                              child: productImages.isNotEmpty
+                                                  ? PageView.builder(
+                                                      itemCount:
+                                                          productImages.length,
+                                                      itemBuilder:
+                                                          (context, imgIndex) {
+                                                        return Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            image:
+                                                                DecorationImage(
+                                                              image:
+                                                                  NetworkImage(
+                                                                'https://humbly-sacred-mongrel.ngrok-free.app/storage/${productImages[imgIndex].image}',
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    )
+                                                  : Placeholder(), // Placeholder or ErrorWidget if image is not available
                                             ),
+                                            SizedBox(height: 20),
+                                            Text(snapshot.data![index].ten ??
+                                                ''), // Product name
+                                            Text(
+                                                '${originalPrice.toStringAsFixed(2)}'), // Original price
+                                            if (discountedPrice !=
+                                                originalPrice)
+                                              Text(
+                                                  '${discountedPrice.toStringAsFixed(2)}'), // Discounted price if applicable
                                           ],
                                         ),
                                       ),
                                     );
                                   },
                                 );
-                              }
-                            },
-                          );
-                        }
-                      })
+                              },
+                            );
+                          },
+                        );
+                      }
+                    },
+                  )
                 ],
               ),
             )),
@@ -691,6 +796,10 @@ class _MainScreenState extends State<HomeScreen> {
 }
 
 class CustomSearchDelegate extends SearchDelegate<String> {
+  final Future<List<Products>> Function(String) searchProducts;
+
+  CustomSearchDelegate(this.searchProducts);
+
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -714,16 +823,76 @@ class CustomSearchDelegate extends SearchDelegate<String> {
   }
 
   @override
-  Widget buildResults(BuildContext context) {
-    return Center(
-      child: Text('Kết quả tìm kiếm cho: $query'),
+  Widget buildSuggestions(BuildContext context) {
+    return const Center(
+      child: Text('Type to search products'),
     );
   }
 
   @override
-  Widget buildSuggestions(BuildContext context) {
-    return const Center(
-      child: Text('Gợi ý tìm kiếm'),
+  Widget buildResults(BuildContext context) {
+    return FutureBuilder<List<Products>>(
+      future: searchProducts(query), // Sử dụng query để tìm kiếm
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No products found'));
+        } else {
+          return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                var product = snapshot.data![index];
+                var imageUrl = product.images.isNotEmpty
+                    ? 'https://humbly-sacred-mongrel.ngrok-free.app/storage/${product.images[0].image}' // Lấy hình ảnh đầu tiên của sản phẩm
+                    : ''; // Xử lý trường hợp không có hình ảnh
+
+                return Card(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ProductDetail(id_sp: product.id_sp)));
+                    },
+                    child: Row(
+                      children: [
+                        imageUrl.isNotEmpty
+                            ? Container(
+                                height: 80,
+                                width: 80, // Đặt chiều cao của hình ảnh
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(imageUrl),
+                                    fit: BoxFit
+                                        .cover, // Chỉnh sửa để hình ảnh vừa với khung
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        Column(
+                          children: [
+                            Text(product.ten ?? ''),
+                            Text(
+                                'Price: ${product.gia}'), // Nếu không có hình ảnh, có thể hiển thị một widget trống hoặc thích hợp khác
+                          ],
+                        ),
+                        Divider(
+                          height: 5,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              });
+        }
+      },
     );
   }
 }
