@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_user/view/profile.dart';
 import 'package:flutter_user/view/registerScreen.dart';
 
 import 'account.dart';
@@ -39,7 +40,6 @@ class _ManscreecState extends State<Manscreec> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const Catelory2(),
-    const NotificationsScreen(),
     const Account(),
   ];
 
@@ -51,9 +51,15 @@ class _ManscreecState extends State<Manscreec> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
          onTap: (index) async {
-       
-           setState(() {
-             _currentIndex = index;
+           if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Profile()),
+            );
+            return;
+          }
+          setState(() {
+            _currentIndex = index;
           });
         },
         selectedLabelStyle: TextStyle(color: Colors.lightBlue[200]),
@@ -71,10 +77,7 @@ class _ManscreecState extends State<Manscreec> {
             icon: Icon(Icons.category),
             label: 'Danh mục',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Thông báo',
-          ),
+          
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Tài khoản',

@@ -163,7 +163,8 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       SizedBox(height: 18),
                       Container(
-                        margin: const EdgeInsets.all(12),
+                        height: 150,
+                        //  margin: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Color.fromRGBO(246, 238, 238, 1),
                           borderRadius: BorderRadius.vertical(
@@ -173,63 +174,57 @@ class _CartScreenState extends State<CartScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.all(10),
-                                  child: Container(
-                                    height: 100,
-                                    width: 100,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          'https://buffalo-quality-ferret.ngrok-free.app/storage/${snapshot.data![index].image}',
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(18),
-                                          bottom: Radius.circular(18)),
+                            Container(
+                              margin: const EdgeInsets.all(10),
+                              child: Container(
+                                height: 150,
+                                width: 140,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      'https://troll-touched-basically.ngrok-free.app/storage/${snapshot.data![index].image}',
                                     ),
+                                    fit: BoxFit.cover,
                                   ),
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(18),
+                                      bottom: Radius.circular(18)),
                                 ),
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 10.0, bottom: 4.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${snapshot.data![index].tensp!.substring(0, 22)}...',
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap:
-                                            true, // Cho phép xuống dòng tự động khi văn bản quá dài
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.start,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10.0, bottom: 4.0),
+                              child: Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${snapshot.data![index].tensp!}',
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      softWrap: true,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Text(
-                                          "Màu sắc: ${snapshot.data![index].ten_color ?? ''}"),
-                                      Text(
-                                          "Kích cỡ: ${snapshot.data![index].ten_size ?? ''}"),
-                                      Text(
-                                        "Số lượng: ${snapshot.data![index].soluong ?? ''}",
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text('Giá '),
-                                          Text(formatCurrency(gia)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                    Text(
+                                        "Màu sắc: ${snapshot.data![index].ten_color ?? ''}"),
+                                    Text(
+                                        "Kích cỡ: ${snapshot.data![index].ten_size ?? ''}"),
+                                    Text(
+                                        "Số lượng: ${snapshot.data![index].soluong ?? ''}"),
+                                    Row(
+                                      children: [
+                                        Text('Giá '),
+                                        Text(formatCurrency(gia)),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                             IconButton(
                               icon: Icon(
@@ -264,15 +259,18 @@ class _CartScreenState extends State<CartScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "${tongtien} VND",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+                  formatCurrency(tongtien),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             Container(
               width: 150,
               height: 80,
-              color: Colors.red[400],
+              color: Colors.red[300],
               child: TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -282,7 +280,7 @@ class _CartScreenState extends State<CartScreen> {
                 },
                 child: Text(
                   "Thanh toán",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
               ),
             ),

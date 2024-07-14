@@ -379,7 +379,7 @@ class _MainScreenState extends State<HomeScreen> {
                                                               DecorationImage(
                                                                   image:
                                                                       NetworkImage(
-                                                                    'https://buffalo-quality-ferret.ngrok-free.app/storage/${productImages[imgIndex].image}',
+                                                                    'https://troll-touched-basically.ngrok-free.app/storage/${productImages[imgIndex].image}',
                                                                   ),
                                                                   fit: BoxFit
                                                                       .cover),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_user/view/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../methods/api.dart';
@@ -183,32 +184,31 @@ class _PaymentScreenState extends State<paymentScreenCard> {
   }
 
   Future<void> deleteCardProduct() async {
-  try {
-    String api = API().getUrl('/deleteCartProduct1');
+    try {
+      String api = API().getUrl('/deleteCartProduct1');
 
-    final response = await dio.delete(
-      api,
-      queryParameters: {
-        'trangthai': 1,
-      },
-      options: Options(
-        headers: {'Accept': 'application/json'},
-      ),
-    );
+      final response = await dio.delete(
+        api,
+        queryParameters: {
+          'trangthai': 1,
+        },
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ),
+      );
 
-    if (response.statusCode == 200) {
-      setState(() {
-        Cardproducts.clear();
-      });
-      print('Products deleted successfully');
-    } else {
-      print('Error deleting products: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        setState(() {
+          Cardproducts.clear();
+        });
+        print('Products deleted successfully');
+      } else {
+        print('Error deleting products: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error deleting products: $e');
     }
-  } catch (e) {
-    print('Error deleting products: $e');
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -346,7 +346,8 @@ class _PaymentScreenState extends State<paymentScreenCard> {
                                               decoration: BoxDecoration(
                                                 image: DecorationImage(
                                                   image: NetworkImage(
-                                                      'https://humbly-sacred-mongrel.ngrok-free.app/storage/${snapshot.data![index].image}',),
+                                                    'https://troll-touched-basically.ngrok-free.app/storage/${snapshot.data![index].image}',
+                                                  ),
                                                   fit: BoxFit.fill,
                                                 ),
                                                 borderRadius:
@@ -502,7 +503,41 @@ class _PaymentScreenState extends State<paymentScreenCard> {
               child: MaterialButton(
                 color: Colors.red[400],
                 onPressed: () async {
-                  await AddOrders2();
+                  diachi != ''
+                      ? await AddOrders2()
+                      : showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Center(
+                                  child: Column(children: [
+                                Text(
+                                  'Bạn vui lòng cập nhật địa chỉ và số điện thoại để giao hàng',
+                                  style: TextStyle(color: Colors.black,fontSize: 20),
+                                ),
+                                SizedBox(height: 30,),
+                                Row( mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Profile()));
+                                        },
+                                        child: Text('Cập Nhật')),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text('Thoát'))
+                                  ],
+                                ),
+                              ])),
+                            );
+                          },
+                        );
                 },
                 child: Container(
                   alignment: Alignment.center,

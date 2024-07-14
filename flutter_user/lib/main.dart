@@ -42,14 +42,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: customTheme,
       
-       //home: Manscreec(),
-      //  initialRoute: '/',
-      // routes: {
-      //   '/': (context) => const Homescreenn(),
-      //  // '/cart': (context) => const Catelory2(),
-      //   '/Notification': (context) => const NotificationsScreen(),
-      //   '/profile': (context) => const Account(),
-      // },
       debugShowCheckedModeBanner: false,
        //initialRoute: '/',
       // routes: {

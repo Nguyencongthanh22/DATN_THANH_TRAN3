@@ -353,7 +353,7 @@ class _PaymentScreenState extends State<paymentScreen> {
                                               decoration: BoxDecoration(
                                                 image: DecorationImage(
                                                   image: NetworkImage(
-                                                    'https://humbly-sacred-mongrel.ngrok-free.app/storage/${snapshot.data![index].image}',
+                                                    'https://troll-touched-basically.ngrok-free.app/storage/${snapshot.data![index].image}',
                                                   ),
                                                   fit: BoxFit.fill,
                                                 ),

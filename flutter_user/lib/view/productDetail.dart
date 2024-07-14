@@ -373,7 +373,7 @@ class _ProductDetailState extends State<ProductDetail> {
                                       return Container(height: 300,width: 370,
                                         margin: EdgeInsets.only(right: 8),
                                         child: Image.network(
-                                          'https://buffalo-quality-ferret.ngrok-free.app/storage/${images[index].image}',
+                                          'https://troll-touched-basically.ngrok-free.app/storage/${images[index].image}',
                                           fit: BoxFit.cover,
                                         ),
                                       );
