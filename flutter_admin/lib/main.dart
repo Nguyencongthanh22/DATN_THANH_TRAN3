@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/view/MainScreen.dart';
 import 'package:flutter_admin/view/loginScreen.dart';
 import 'package:flutter_admin/view/profile.dart';
 import 'package:flutter_admin/view/registerScreen.dart';
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: customTheme, 
       debugShowCheckedModeBanner: false,
-      home:SparkBarChartExample(),
+      home:LogInScreen(),
     );
   }
 }

@@ -97,7 +97,7 @@ class _MainScreenState extends State<HomeScreen> {
     29,
     30,
     31,
-    32
+    133,134
   ];
   List<int> categorycap = [1];
   List<int> categorycap2 = [2];
@@ -379,7 +379,7 @@ class _MainScreenState extends State<HomeScreen> {
                       FloatingActionButton(
                         mini: true,
                         onPressed: () {
-                          if (quyen == 1) {
+                          if (quyen == 0) {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -733,48 +733,50 @@ class _MainScreenState extends State<HomeScreen> {
                                           ),
                                         );
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(0.0),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 150,
-                                              width: 230,
-                                              child: productImages.isNotEmpty
-                                                  ? PageView.builder(
-                                                      itemCount:
-                                                          productImages.length,
-                                                      itemBuilder:
-                                                          (context, imgIndex) {
-                                                        return Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            image:
-                                                                DecorationImage(
+                                      child: Expanded(
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(0.0),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                height: 150,
+                                                width: 230,
+                                                child: productImages.isNotEmpty
+                                                    ? PageView.builder(
+                                                        itemCount:
+                                                            productImages.length,
+                                                        itemBuilder:
+                                                            (context, imgIndex) {
+                                                          return Container(
+                                                            decoration:
+                                                                BoxDecoration(
                                                               image:
-                                                                  NetworkImage(
-                                                                'https://humbly-sacred-mongrel.ngrok-free.app/storage/${productImages[imgIndex].image}',
+                                                                  DecorationImage(
+                                                                image: 
+                                                                    NetworkImage(
+                                                                  'https://buffalo-quality-ferret.ngrok-free.app/storage/${productImages[imgIndex].image}',
+                                                                ), fit: BoxFit.cover,
                                                               ),
                                                             ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    )
-                                                  : Placeholder(), // Placeholder or ErrorWidget if image is not available
-                                            ),
-                                            SizedBox(height: 20),
-                                            Text(snapshot.data![index].ten ??
-                                                ''), // Product name
-                                            Text(
-                                                '${originalPrice.toStringAsFixed(2)}'), // Original price
-                                            if (discountedPrice !=
-                                                originalPrice)
+                                                          );
+                                                        },
+                                                      )
+                                                    : Placeholder(), // Placeholder or ErrorWidget if image is not available
+                                              ),
+                                             // SizedBox(height: 20),
+                                              Text(snapshot.data![index].ten ??
+                                                  ''.substring(0,40) ,maxLines: 2,), // Product name
                                               Text(
-                                                  '${discountedPrice.toStringAsFixed(2)}'), // Discounted price if applicable
-                                          ],
+                                                  '${originalPrice.toStringAsFixed(2)}'), // Original price
+                                              if (discountedPrice !=
+                                                  originalPrice)
+                                                Text(
+                                                    '${discountedPrice.toStringAsFixed(2)}'), // Discounted price if applicable
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );

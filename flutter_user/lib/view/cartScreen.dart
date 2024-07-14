@@ -6,6 +6,7 @@ import '../methods/api.dart';
 import '../models/cardProduct.dart';
 import 'paymentScreen.dart';
 import 'paymentScreen2.dart';
+import 'package:intl/intl.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -26,6 +27,12 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     streamCardProduct = fetchDataStream();
+  }
+
+  String formatCurrency(double amount) {
+    final NumberFormat formatter =
+        NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    return formatter.format(amount);
   }
 
   Future<String?> getUserEmail() async {
@@ -55,10 +62,11 @@ class _CartScreenState extends State<CartScreen> {
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
-        List<CardProduct> fetchedProducts = data.map((json) => CardProduct.fromJson(json)).toList();
+        List<CardProduct> fetchedProducts =
+            data.map((json) => CardProduct.fromJson(json)).toList();
         Cardproducts.addAll(fetchedProducts);
         setState(() {
-          tongtien = calculateTotal(); 
+          tongtien = calculateTotal();
         });
         print('______________________${Cardproducts}');
         yield Cardproducts.cast<CardProduct>();
@@ -81,31 +89,33 @@ class _CartScreenState extends State<CartScreen> {
     double total = 0.0;
     for (var product in Cardproducts) {
       total += (double.parse(product!.gia!) * product.soluong!);
+      print('__________${total}');
     }
     return total;
   }
 
   Future<void> deleteCardProduct(int id) async {
     try {
-      String api = API().getUrl('/cardproduct/$id');
+      String api = API().getUrl('/deleteCartProduct');
+
       final response = await dio.delete(
         api,
+        queryParameters: {'id': id},
         options: Options(
           headers: {'Accept': 'application/json'},
         ),
       );
 
+      setState(() {
+        Cardproducts.removeWhere((product) => product?.id == id);
+        tongtien = calculateTotal();
+        print('__________________${response.statusCode}');
+      });
       if (response.statusCode == 200) {
-        setState(() {
-          Cardproducts.removeWhere((product) => product?.id == id);
-        });
-        print('Product deleted successfully');
-        print('Error deleting product: ${response.statusCode}');
       } else {
         print('Error deleting product: ${response.statusCode}');
         if (response.statusCode == 404) {
-        } else {
-        }
+        } else {}
       }
     } catch (e) {
       print('Error deleting product: $e');
@@ -173,8 +183,9 @@ class _CartScreenState extends State<CartScreen> {
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
                                         image: NetworkImage(
-                                             'https://humbly-sacred-mongrel.ngrok-free.app/storage/${snapshot.data![index].image}',),
-                                        fit: BoxFit.fill,
+                                          'https://buffalo-quality-ferret.ngrok-free.app/storage/${snapshot.data![index].image}',
+                                        ),
+                                        fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.vertical(
                                           top: Radius.circular(18),
@@ -191,10 +202,15 @@ class _CartScreenState extends State<CartScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        snapshot.data![index].tensp ?? '',
+                                        '${snapshot.data![index].tensp!.substring(0, 22)}...',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap:
+                                            true, // Cho phép xuống dòng tự động khi văn bản quá dài
                                         style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                         textAlign: TextAlign.start,
                                       ),
                                       Text(
@@ -207,7 +223,7 @@ class _CartScreenState extends State<CartScreen> {
                                       Row(
                                         children: [
                                           Text('Giá '),
-                                          Text('$gia'),
+                                          Text(formatCurrency(gia)),
                                         ],
                                       ),
                                     ],
@@ -217,12 +233,15 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             IconButton(
                               icon: Icon(
-                                Icons.close,
+                                Icons.delete_sharp,
+                                color: Colors.red,
                                 size: 30,
                               ),
                               onPressed: () {
-                                deleteCardProduct(
-                                    snapshot.data![index].id ?? 0);
+                                setState(() {
+                                  deleteCardProduct(
+                                      snapshot.data![index].id ?? 0);
+                                });
                               },
                             ),
                           ],
@@ -256,8 +275,10 @@ class _CartScreenState extends State<CartScreen> {
               color: Colors.red[400],
               child: TextButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => paymentScreenCard()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => paymentScreenCard()));
                 },
                 child: Text(
                   "Thanh toán",

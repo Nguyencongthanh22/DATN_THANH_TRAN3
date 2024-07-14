@@ -7,7 +7,6 @@ import 'package:flutter_user/models/category.dart';
 import '../../methods/api.dart';
 import 'categoryConNam.dart';
 import 'categoryBB.dart';
-import 'categoryConNam.dart';
 import 'categoryTE.dart';
 import 'categoryconNu.dart';
 
@@ -467,7 +466,7 @@ class _CateloryState extends State<Catelory2> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  CategoryNam2(
+                                                  CategoryBB(
                                                     Id_cha: categoriesNam[i]
                                                         ?.id_danhmuc,
                                                   )));

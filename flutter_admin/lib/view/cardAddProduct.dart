@@ -1,10 +1,11 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_admin/view/homeScreen.dart';
 import 'package:image_picker/image_picker.dart';
 import '../Method/api.dart';
 import '../models/ProductVaritation.dart';
+import 'homeScreen.dart';
 
 class AddCardProduct extends StatefulWidget {
   final int? id_sp;
@@ -18,6 +19,7 @@ class _AddCardProductState extends State<AddCardProduct> {
   late Future<List<Producvaritation>> futureProduct;
   Dio dio = Dio();
   List<Producvaritation> productVariations = [];
+  List<File?> selectedImages = []; // List to store selected images for each card
 
   @override
   void initState() {
@@ -25,13 +27,12 @@ class _AddCardProductState extends State<AddCardProduct> {
     futureProduct = fetchData();
   }
 
-  File? _image;
-  final picker = ImagePicker();
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(int index) async {
+    final picker = ImagePicker();
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _image = File(pickedFile.path);
+        selectedImages[index] = File(pickedFile.path); // Update selected image for specific index
       });
     }
   }
@@ -58,6 +59,7 @@ class _AddCardProductState extends State<AddCardProduct> {
           Producvaritation productVariationItem =
               Producvaritation.fromJson(item);
           productVariations.add(productVariationItem);
+          selectedImages.add(null); // Initialize selected image list with null for each card
         }
       } else {
         print('Error fetching data: ${response.statusCode}');
@@ -70,15 +72,15 @@ class _AddCardProductState extends State<AddCardProduct> {
     return productVariations;
   }
 
-  Future<void> _uploadImage(int colorId) async {
+  Future<void> _uploadImage(int colorId, int index) async {
+    File? _image = selectedImages[index];
     if (_image == null) return;
 
-    String apiUrl =
-        API().getUrl('/uploadImage'); // Replace with your Laravel API endpoint
-    String fileName = _image!.path.split('/').last;
+    String apiUrl = API().getUrl('/uploadImage');
+    String fileName = _image.path.split('/').last;
 
     FormData formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(_image!.path, filename: fileName),
+      'image': await MultipartFile.fromFile(_image.path, filename: fileName),
       'id_sp': widget.id_sp,
       'id_color': colorId,
     });
@@ -97,11 +99,14 @@ class _AddCardProductState extends State<AddCardProduct> {
 
       if (response.statusCode == 200) {
         print('Image uploaded successfully');
-        
-      }
-      
-      else if  (response.statusCode == 420) {
-        
+
+        // Update the selected product variation's image state
+        setState(() {
+          productVariations[index].imageUploaded = true;
+        });
+
+      } else if (response.statusCode == 420) {
+        // Handle specific status code if needed
       } else {
         print(
             'Failed to upload image: ${response.statusCode} ${response.statusMessage}');
@@ -111,7 +116,10 @@ class _AddCardProductState extends State<AddCardProduct> {
         print('Dio error: ${e.message}');
         if (e.response != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Màu sản phẩm đã được thêm hình ảnh trước đó')));
+            SnackBar(
+              content: Text('Màu sản phẩm đã được thêm hình ảnh trước đó'),
+            ),
+          );
           print('Error response: ${e.response}');
         }
       } else {
@@ -160,37 +168,44 @@ class _AddCardProductState extends State<AddCardProduct> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                             side: BorderSide(
-                                color: Color.fromARGB(255, 248, 128, 120),
-                                width: 1.0),
+                              color: Color.fromARGB(255, 248, 128, 120),
+                              width: 1.0,
+                            ),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Column(children: [
-                              GestureDetector(
-                                onTap: _pickImage,
-                                
-                                child: _image != null
-                                    ? Image.file(
-                                        _image!,
-                                        height: 100,
-                                        width: 100,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Icon(Icons.image, size: 100),
-                              ),
-                              SizedBox(height: 10),
-                              Text('Color: ${snapshot.data![index].Ten_size}',
-                                  style: TextStyle(fontSize: 16)),
-                              Text('Size: ${snapshot.data![index].name_color}',
-                                  style: TextStyle(fontSize: 16)),
-                              Text(
-                                  'Quantity: ${snapshot.data![index].so_luong}',
-                                  style: TextStyle(fontSize: 16)),
-                            ]),
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => _pickImage(index),
+                                  child: selectedImages[index] != null
+                                      ? Image.file(
+                                          selectedImages[index]!,
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Icon(Icons.image, size: 100),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  'Màu sắc: ${snapshot.data![index].name_color}',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                // Text(
+                                //   'Kích thước: ${snapshot.data![index].Ten_size}',
+                                //   style: TextStyle(fontSize: 16),
+                                // ),
+                                // Text(
+                                //   'Số lượng: ${snapshot.data![index].so_luong}',
+                                //   style: TextStyle(fontSize: 16),
+                                // ),
+                              ],
+                            ),
                           ),
                         ),
                         onTap: () {
-                          _uploadImage(snapshot.data![index].id_color ?? 0);
+                          _uploadImage(snapshot.data![index].id_color ?? 0, index);
                         },
                       );
                     },

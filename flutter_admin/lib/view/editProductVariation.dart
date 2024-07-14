@@ -181,7 +181,6 @@ class _AddProductState extends State<EditProductVariation> {
                       onChanged: (String? newValue) {
                         setState(() {
                           dropdownValueColor = newValue!;
-                          // Gán nameColor từ map
                           nameColor = colorValueMap[newValue]!;
                         });
                       },

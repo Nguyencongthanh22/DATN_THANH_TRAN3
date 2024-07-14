@@ -1,5 +1,5 @@
 class Producvaritation {
-  int? id_bienthe;
+  int? id;
   int? id_sp;
   int? id_size;
   String? Ten_size;
@@ -7,9 +7,10 @@ class Producvaritation {
   String? name_color;
   int? so_luong;
   int? trangthai;
+  bool imageUploaded;
 
   Producvaritation({
-    this.id_bienthe,
+    this.id,
     this.id_sp,
     this.id_size,
     this.Ten_size,
@@ -17,11 +18,12 @@ class Producvaritation {
     this.name_color,
     this.so_luong,
     this.trangthai,
+    this.imageUploaded = false,
   });
 
   factory Producvaritation.fromJson(Map<String, dynamic> json) {
     return Producvaritation(
-      id_bienthe: json['id_bienthe'] as int?,
+      id: json['id'] as int?,
       id_sp: json['id_sp'] as int?,
       id_size: json['id_size'] as int?,
       Ten_size: json['Ten_size'] as String?,

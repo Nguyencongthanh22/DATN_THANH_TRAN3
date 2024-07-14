@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../methods/api.dart';
 import '../models/Order.dart';
 import 'orderProductDetail.dart';
@@ -20,61 +20,78 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
   late List<Order> _ordersDangGiao = [];
   late List<Order> _ordersDaGiao = [];
   late List<Order> _ordersDaHuy = [];
+  late Future<String?> futureEmail;
+  String? emails;
+  Future<String?> getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    emails = preferences.getString('email');
+    print('___________${emails}');
+    return emails;
+  }
 
   @override
-  void initState() {
-    super.initState();
-    _fetchOrders('choxacnhan').then((orders) {
-      setState(() {
-        _ordersXacnhan = orders;
-      });
-    });
-    _fetchOrders('dangxuly').then((orders) {
-      setState(() {
-        _ordersDangXuly = orders;
-      });
-    });
-    _fetchOrders('danggiao').then((orders) {
-      setState(() {
-        _ordersDangGiao = orders;
-      });
-    });
-    _fetchOrders('dagiao').then((orders) {
-      setState(() {
-        _ordersDaGiao = orders;
-      });
-    });
-    _fetchOrders('dahuy').then((orders) {
-      setState(() {
-        _ordersDaHuy = orders;
-      });
-    });
-  }
+void initState() {
+  super.initState();
+  futureEmail = getUserEmail().then((email) {
+    emails = email;
+    _initializeOrders();
+  });
+}
 
-  Future<List<Order>> _fetchOrders(String status) async {
-    try {
-      String api = API().getUrl('/getOrder');
-      final response = await Dio().get(
-        api,
-        queryParameters: {'trangthai': status},
-        options: Options(
-          headers: {'Accept': 'application/json'},
-        ),
-      );
+void _initializeOrders() {
+  _fetchOrders('choxacnhan', emails).then((orders) {
+    setState(() {
+      _ordersXacnhan = orders;
+    });
+  });
+  _fetchOrders('dangxuly', emails).then((orders) {
+    setState(() {
+      _ordersDangXuly = orders;
+    });
+  });
+  _fetchOrders('danggiao', emails).then((orders) {
+    setState(() {
+      _ordersDangGiao = orders;
+    });
+  });
+  _fetchOrders('dagiao', emails).then((orders) {
+    setState(() {
+      _ordersDaGiao = orders;
+    });
+  });
+  _fetchOrders('dahuy', emails).then((orders) {
+    setState(() {
+      _ordersDaHuy = orders;
+    });
+  });
+}
 
-      if (response.statusCode == 200) {
-        List<dynamic> data = response.data;
-        List<Order> orders = data.map((json) => Order.fromJson(json)).toList();
-        return orders;
-      } else {
-        print('Error fetching data: ${response.statusCode}');
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print('Error fetching data: $e');
+
+  Future<List<Order>> _fetchOrders(String status,String? email) async {
+  try {
+    String api = API().getUrl('/getOrder');
+    final response = await Dio().get(
+      api,
+      queryParameters: {'trangthai': status,'email':email  },
+      options: Options(
+        headers: {'Accept': 'application/json'},
+      ),
+    );
+    print('Response data: ${response.data}');
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = response.data['orders']; 
+      List<Order> orders = data.map((json) => Order.fromJson(json)).toList();
+      return orders;
+    } else {
+      print('Error fetching data: ${response.statusCode}');
       throw Exception('Failed to load data');
     }
+  } catch (e) {
+    print('Error fetching data: $e');
+    throw Exception('Failed to load data');
   }
+}
 
   void _updateOrder(int id, String status) async {
     String api = API().getUrl('/updateOrder');
@@ -108,35 +125,35 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
           // Cập nhật lại danh sách đơn hàng cho tab tương ứng
           switch (status) {
             case 'choxacnhan':
-              _fetchOrders('choxacnhan').then((orders) {
+              _fetchOrders('choxacnhan',emails).then((orders) {
                 setState(() {
                   _ordersXacnhan = orders;
                 });
               });
               break;
             case 'dangxuly':
-              _fetchOrders('dangxuly').then((orders) {
+              _fetchOrders('dangxuly',emails).then((orders) {
                 setState(() {
                   _ordersDangXuly = orders;
                 });
               });
               break;
             case 'danggiao':
-              _fetchOrders('danggiao').then((orders) {
+              _fetchOrders('danggiao',emails).then((orders) {
                 setState(() {
                   _ordersDangGiao = orders;
                 });
               });
               break;
             case 'dagiao':
-              _fetchOrders('dagiao').then((orders) {
+              _fetchOrders('dagiao',emails).then((orders) {
                 setState(() {
                   _ordersDaGiao = orders;
                 });
               });
               break;
             case 'dahuy':
-              _fetchOrders('dahuy').then((orders) {
+              _fetchOrders('dahuy',emails).then((orders) {
                 setState(() {
                   _ordersDaHuy = orders;
                 });
@@ -278,85 +295,86 @@ class OrderCard extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => OrderProductDetail(
-                      id: order.id,
-                      trangthai: order.trangthai,
-                    )));
-        child:
-        Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    children: [
-                      Text('#dh90${order.id}'),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    status,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      color: Colors.black,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                )
-              ],
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderProductDetail(
+              id: order.id,
+              trangthai: order.trangthai,
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: Image.network(
-                    order.image ?? '', // Replace with your image field
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.email ?? '', // Replace with your email field
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        'Total: ${order.tongtien}', // Replace with your total field
-                        style: const TextStyle(color: Colors.red, fontSize: 15),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: onUpdate,
-                              child: const Text(
-                                "Hủy đơn hàng",
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            )
-          ],
+          ),
         );
       },
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  children: [
+                    Text('#dh90${order.id}'),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  status,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 130,
+                height: 130,
+                child: Image.network(
+                  order.image ?? '', // Replace with your image field
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.email ?? '', // Replace with your email field
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    Text(
+                      'Total: ${order.tongtien}', // Replace with your total field
+                      style: const TextStyle(color: Colors.red, fontSize: 15),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: onUpdate,
+                            child: const Text(
+                              "Hủy đơn hàng",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -461,78 +479,79 @@ class OrderCardHUY extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => OrderProductDetail(
-                      id: order.id,
-                      trangthai: order.trangthai,
-                    )));
-        child:
-        Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    children: [
-                      Text('#dh90${order.id}'),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    status,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      color: Colors.black,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                )
-              ],
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderProductDetail(
+              id: order.id,
+              trangthai: order.trangthai,
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: Image.network(
-                    order.image ?? '', // Replace with your image field
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.email ?? '', // Replace with your email field
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        'Total: ${order.tongtien}', // Replace with your total field
-                        style: const TextStyle(color: Colors.red, fontSize: 15),
-                      ),
-                      TextButton(
-                        onPressed: onUpdate2,
-                        child: const Text(
-                          "Mua lại",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            )
-          ],
+          ),
         );
       },
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  children: [
+                    Text('#dh90${order.id}'),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  status,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 130,
+                height: 130,
+                child: Image.network(
+                  order.image ?? '',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.email ?? '',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    Text(
+                      'Total: ${order.tongtien}',
+                      style: const TextStyle(color: Colors.red, fontSize: 15),
+                    ),
+                    TextButton(
+                      onPressed: onUpdate2,
+                      child: const Text(
+                        "Mua lại",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

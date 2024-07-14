@@ -65,8 +65,8 @@ class _AddProductState extends State<AddProductVariation> {
 
   String dropdownValueColor = '1';
   String dropdownValueSize = '1';
-  String nameColor = '';
-  String nameSize = ''; 
+  String nameColor = 'Trắng';
+  String nameSize = 'S'; 
   Map<String, String> colorValueMap = {
     '1': 'Trắng',
     '2': 'Đen',
@@ -74,6 +74,12 @@ class _AddProductState extends State<AddProductVariation> {
     '4': 'Xanh lá',
     '5': 'Đỏ',
     '6': 'Vàng',
+    '7': 'Hồng',
+    '8': 'Xám',
+    '9': 'Nâu',
+    '10':'Tím',
+    '11':'Be',
+    '12':'Cam',
   };
 
   Map<String, String> sizeValueMap = {

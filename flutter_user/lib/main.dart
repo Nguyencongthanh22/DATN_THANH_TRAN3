@@ -1,10 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_user/view/MainScreen.dart';
 import 'package:flutter_user/view/logInScreen.dart';
 import 'package:flutter_user/view/profile.dart';
 import 'view/account.dart';
 import 'view/HomeScreen.dart';
+import 'view/category/category.dart';
 import 'view/listCardProductOrder.dart';
+import 'view/productDetail.dart';
 import 'view/productreviews.dart';
 import 'view/thongbao.dart';
 
@@ -39,7 +42,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: customTheme,
       
-       home: HomeScreen(),
+       //home: Manscreec(),
       //  initialRoute: '/',
       // routes: {
       //   '/': (context) => const Homescreenn(),
@@ -48,6 +51,14 @@ class MyApp extends StatelessWidget {
       //   '/profile': (context) => const Account(),
       // },
       debugShowCheckedModeBanner: false,
+       //initialRoute: '/',
+      // routes: {
+      //   '/': (context) => const Manscreec(),
+      //   '/carte': (context) => const Catelory2(),
+      //   '/NotificationsScreen': (context) => const NotificationsScreen(),
+      //   '/Account': (context) => const Account(),
+      // },
+        home: LogInScreen(),
     );
   }
 }

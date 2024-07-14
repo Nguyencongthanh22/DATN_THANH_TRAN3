@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 Dio dio = Dio();
@@ -8,7 +10,7 @@ class Order {
   String? email;
   String? tongtien;
   String? diachi;
-  //final int ngaydat;
+   String? ngaydat;
   String image;
   String? trangthai;
   String? email_nv;
@@ -21,6 +23,7 @@ class Order {
     required this.diachi,
     required this.trangthai,
     required this.email_nv,
+    required this.ngaydat
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -32,6 +35,7 @@ class Order {
       tongtien: json['tongtien'] ?? '',
       diachi: json['diachi'] ?? '',
       trangthai: json['trangthai'] ?? '',
+      ngaydat:json['ngaydat']??''
     );
   }
 }

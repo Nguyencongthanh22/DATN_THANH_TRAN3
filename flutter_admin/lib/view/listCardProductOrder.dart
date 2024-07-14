@@ -58,7 +58,7 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
 
   Future<List<Order>> _fetchOrders(String status) async {
     try {
-      String api = API().getUrl('/getOrder');
+      String api = API().getUrl('/getOrderAdmin');
       final response = await Dio().get(
         api,
         queryParameters: {'trangthai': status},
@@ -435,6 +435,7 @@ class OrderCard extends StatelessWidget {
                     'Total: ${order.tongtien}', // Replace with your total field
                     style: const TextStyle(color: Colors.red, fontSize: 15),
                   ),
+                  Text('Thời gian: ${order.ngaydat}',style: const TextStyle(fontSize: 15)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -524,6 +525,7 @@ class OrderCard2 extends StatelessWidget {
                     'Total: ${order.tongtien}', // Replace with your total field
                     style: const TextStyle(color: Colors.red, fontSize: 15),
                   ),
+                  Text('Thời gian: ${order.ngaydat}',style: const TextStyle(fontSize: 15)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -608,7 +610,7 @@ class OrderCardDagiao extends StatelessWidget {
                     'Total: ${order.tongtien}', // Replace with your total field
                     style: const TextStyle(color: Colors.red, fontSize: 15),
                   ),
-                  ElevatedButton(onPressed: () {}, child: Text('Đánh giá'))
+                  Text('Thời gian: ${order.ngaydat}',style: const TextStyle(fontSize: 15)),
                 ],
               ),
             )

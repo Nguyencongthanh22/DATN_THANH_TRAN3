@@ -330,7 +330,7 @@ class _ProductDetailState extends State<ProductDetail> {
                                         onTap: () {
                                           setState(() {
                                             for (var other
-                                                in radioOptionsColor) {
+                                                in radioOptionsSize) {
                                               if (other != option) {
                                                 other.isSelected = false;
                                               }
@@ -407,7 +407,7 @@ class _ProductDetailState extends State<ProductDetail> {
               child: MaterialButton(
                 color: Colors.red[400],
                 onPressed: () {
-                  quyen == 1
+                  quyen == 0
                       ? showDialog(
                           context: context,
                           builder: (BuildContext context) {

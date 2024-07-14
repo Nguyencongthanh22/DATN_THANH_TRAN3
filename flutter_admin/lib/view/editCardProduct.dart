@@ -12,12 +12,14 @@ class ProductCard extends StatefulWidget {
   final String? size;
   int? quantity;
   final String? image;
+  final int? trangthai;
   final VoidCallback onDelete;
 
   ProductCard({
     required this.color,
     required this.size,
     required this.quantity,
+    required this.trangthai,
     this.image,
     required this.onDelete,
   });
@@ -83,6 +85,7 @@ class _ProductCardState extends State<ProductCard> {
                   onPressed: () {
                     widget.onDelete();
                     Navigator.of(context).pop();
+                    setState(() {});
                   },
                   child: Text('Xóa',
                       style: TextStyle(color: Colors.white, fontSize: 20)),
@@ -106,62 +109,72 @@ class _ProductCardState extends State<ProductCard> {
             side: BorderSide(
                 color: Color.fromARGB(255, 248, 128, 120), width: 1.0),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: _image != null
-                      ? Image.file(
-                          _image!,
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
-                        )
-                      : widget.image != null
-                          ? Image.network(
-                              widget.image!,
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.cover,
-                            )
-                          : Icon(Icons.image, size: 100),
-                ),
-                SizedBox(height: 10),
-                Text('Color: ${widget.color}', style: TextStyle(fontSize: 16)),
-                Text('Size: ${widget.size}', style: TextStyle(fontSize: 16)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Quantity: ', style: TextStyle(fontSize: 16)),
-                    Container(
-                      width: 50,
-                      child: TextField(
-                        controller: _quantityController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          setState(() {
-                            widget.quantity = int.parse(value);
-                          });
-                        },
+          child: widget.trangthai == 1
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: _image != null
+                            ? Image.file(
+                                _image!,
+                                height: 100,
+                                width: 100,
+                                fit: BoxFit.cover,
+                              )
+                            : widget.image != null
+                                ? Image.network(
+                                    widget.image!,
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Icon(Icons.image, size: 100),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 10),
+                      Text('Color: ${widget.color}',
+                          style: TextStyle(fontSize: 16)),
+                      Text('Size: ${widget.size}',
+                          style: TextStyle(fontSize: 16)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Số lượng: ', style: TextStyle(fontSize: 16)),
+                          Container(
+                            width: 80,
+                            child: TextField(
+                              controller: _quantityController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                setState(() {
+                                  widget.quantity = int.parse(value);
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : SizedBox(
+                  height: 1,
                 ),
-              ],
-            ),
-          ),
         ),
         Positioned(
           right: 0,
           child: IconButton(
-            icon: Icon(Icons.close_sharp, color: Colors.red),
-            onPressed: _showDeleteDialog,
-          ),
+              icon: Icon(Icons.close_sharp, color: Colors.red),
+              onPressed: () {
+                  _showDeleteDialog;
+                setState(() {
+                  
+                });
+              }),
         ),
       ],
     );
@@ -173,7 +186,6 @@ class EditCardProduct extends StatefulWidget {
 
   const EditCardProduct({Key? key, this.id_sp}) : super(key: key);
   @override
-  
   _EditCardProductState createState() => _EditCardProductState();
 }
 
@@ -181,11 +193,42 @@ class _EditCardProductState extends State<EditCardProduct> {
   late Future<List<Producvaritation>> futureProduct;
   Dio dio = Dio();
   List<Producvaritation> productVariations = [];
-
+  List<int> id_bienthe = [];
   @override
   void initState() {
     super.initState();
     futureProduct = fetchData();
+  }
+
+  Future<void> updateProfile(int id) async {
+    String api = API().getUrl('/updateVari');
+    try {
+      final response = await Dio().put(
+        api,
+        data: {
+          'id': id,
+          'trangthai': 0,
+        },
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {});
+        print('Profile updated successfully');
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: ((context) => HomeScreen())),
+        //);
+      } else {
+        print('Failed to update profile: ${response.data}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   Future<List<Producvaritation>> fetchData() async {
@@ -209,6 +252,7 @@ class _EditCardProductState extends State<EditCardProduct> {
           Producvaritation productVariationItem =
               Producvaritation.fromJson(item);
           productVariations.add(productVariationItem);
+          id_bienthe.add(productVariationItem.id ?? 0);
         }
       } else {
         print('Error fetching data: ${response.statusCode}');
@@ -221,12 +265,11 @@ class _EditCardProductState extends State<EditCardProduct> {
     return productVariations;
   }
 
-
-  void _deleteProduct(int index) {
-    setState(() {
-        productVariations.removeAt(index);
-    });
-  }
+  // void _deleteProduct(int index) {
+  //   setState(() {
+  //     productVariations.removeAt(index);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -263,10 +306,12 @@ class _EditCardProductState extends State<EditCardProduct> {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       return ProductCard(
+                        trangthai: snapshot.data![index].trangthai,
                         color: snapshot.data![index].name_color,
                         size: snapshot.data![index].Ten_size,
                         quantity: snapshot.data![index].so_luong,
-                       onDelete: () => _deleteProduct(index),
+                        onDelete: () =>
+                            updateProfile(snapshot.data![index].id ?? 0),
                       );
                     },
                   );
@@ -301,5 +346,3 @@ class _EditCardProductState extends State<EditCardProduct> {
     );
   }
 }
-
-

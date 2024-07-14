@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_user/models/ProductVaritication.dart';
 import 'package:flutter_user/models/product.dart';
 import 'package:flutter_user/view/numberUpDown.dart';
@@ -52,11 +54,17 @@ class _ProductDetailState extends State<ProductDetail> {
     productdetail = fetchData();
     productVariations = fetchVariations();
     radioOptionsColor = getUniqueColors(vari);
-    radioOptionsSize = getUniqueSizes(vari);
+    //  radioOptionsSize = getUniqueSizes(vari);
     futureEmail = getUserEmail();
     futurediachi = getUserdiachi();
     futuresodienthoai = getUsersodienthoai();
     Imagess = fetchDataImage();
+  }
+
+  String formatCurrency(double amount) {
+    final NumberFormat formatter =
+        NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    return formatter.format(amount);
   }
 
   Future<List<Product>> fetchData() async {
@@ -130,6 +138,20 @@ class _ProductDetailState extends State<ProductDetail> {
     return images;
   }
 
+  List<RadioButtonModel> getUniqueSizesForColor(String? color) {
+    final seenSizes = <String>{};
+    return vari.where((v) => v.name_color == color).where((v) {
+      // Filter out duplicates
+      return seenSizes.add(v.Ten_size ?? '');
+    }).map((v) {
+      // Map to RadioButtonModel
+      return RadioButtonModel(
+        isSelected: false,
+        buttonText: v.Ten_size ?? '',
+      );
+    }).toList();
+  }
+
   Future<List<Producvaritation>> fetchVariations() async {
     try {
       String api2 = API().getUrl('/getProductVaritication');
@@ -147,7 +169,7 @@ class _ProductDetailState extends State<ProductDetail> {
             data2.map((json) => Producvaritation.fromJson(json)).toList();
         vari.addAll(fetchedProducts2);
         radioOptionsColor = getUniqueColors(vari);
-        radioOptionsSize = getUniqueSizes(vari);
+        // radioOptionsSize = getUniqueSizes(vari);
       } else {
         print('Error fetching data: ${response2.statusCode}');
       }
@@ -208,19 +230,7 @@ class _ProductDetailState extends State<ProductDetail> {
 
   String? selectedColor;
   String? selectedSize;
-  List<RadioButtonModel> getUniqueSizes(List<Producvaritation> variations) {
-    final seenSizes = <String>{};
-    return variations.where((v) {
-      // Filter out duplicates
-      return seenSizes.add(v.Ten_size ?? '');
-    }).map((v) {
-      // Map to RadioButtonModel
-      return RadioButtonModel(
-        isSelected: false,
-        buttonText: v.Ten_size ?? '',
-      );
-    }).toList();
-  }
+  
 
   Future<Map<String, String?>> getUserInfo() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -251,6 +261,8 @@ class _ProductDetailState extends State<ProductDetail> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Đơn hàng đã được thêm vào giỏ hàng')));
     } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Bạn vui lòng chọn kích thước và màu sắc sản phẩm')));
       print('Error________________: ${response['message']}');
     }
   }
@@ -275,6 +287,8 @@ class _ProductDetailState extends State<ProductDetail> {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => paymentScreen()));
     } else {
+       ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Bạn vui lòng chọn kích thước và màu sắc sản phẩm')));
       print('Error________________: ${response['message']}');
     }
   }
@@ -285,6 +299,7 @@ class _ProductDetailState extends State<ProductDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+       backgroundColor: Colors.deepOrange[100],
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(
@@ -346,27 +361,19 @@ class _ProductDetailState extends State<ProductDetail> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  product.ten ?? "Tên sản phẩm",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text("5/5", style: TextStyle(fontSize: 18)),
-                                SizedBox(height: 8),
+                                
+                               
                                 Container(
                                   height: 250,
-                                  width: double.infinity,
+                                 // width: 900,
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: images.length,
                                     itemBuilder: (context, index) {
-                                      return Container(
-                                        margin: EdgeInsets.only(right: 16),
+                                      return Container(height: 300,width: 370,
+                                        margin: EdgeInsets.only(right: 8),
                                         child: Image.network(
-                                          'https://humbly-sacred-mongrel.ngrok-free.app/storage/${images[index].image}',
+                                          'https://buffalo-quality-ferret.ngrok-free.app/storage/${images[index].image}',
                                           fit: BoxFit.cover,
                                         ),
                                       );
@@ -374,45 +381,141 @@ class _ProductDetailState extends State<ProductDetail> {
                                   ),
                                 ),
                                 SizedBox(height: 16),
-                                Text("Màu sắc", style: TextStyle(fontSize: 18)),
+                                Text(
+                                  product.ten ?? "Tên sản phẩm",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                 SizedBox(height: 8),
+                                Text("Màu sắc", style: TextStyle(fontSize: 23,fontWeight: FontWeight.bold)),
                                 SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    for (var option in radioOptionsColor)
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            for (var other
-                                                in radioOptionsColor) {
-                                              other.isSelected = false;
-                                            }
-                                            option.isSelected = true;
-                                            selectedColor = option.buttonText;
-                                          });
-                                        },
-                                        child: SquareRadioButtonItem(option),
-                                      ),
-                                  ],
+                                Wrap(
+                                  children: getUniqueColors(vari)
+                                      .map(
+                                        (option) => GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedColor = option.buttonText;
+                                              radioOptionsSize =
+                                                  getUniqueSizesForColor(
+                                                      selectedColor);
+                                            });
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: Container(
+                                              height: 50,
+                                              width: 50,
+                                              decoration: BoxDecoration(
+                                                  color: option.buttonText ==
+                                                          'Trắng'
+                                                      ? selectedColor ==
+                                                              option.buttonText
+                                                          ? Colors.redAccent
+                                                          : Colors.white
+                                                      : option.buttonText ==
+                                                              'Đỏ'
+                                                          ? selectedColor ==
+                                                                  option
+                                                                      .buttonText
+                                                              ? Colors.redAccent
+                                                              : Colors.red[300]
+                                                          : option.buttonText ==
+                                                                  'Xanh dương'
+                                                              ? selectedColor ==
+                                                                      option
+                                                                          .buttonText
+                                                                  ? Colors
+                                                                      .redAccent
+                                                                  : Colors
+                                                                      .blue[400]
+                                                              : option.buttonText ==
+                                                                      'Đen'
+                                                                  ? selectedColor ==
+                                                                          option
+                                                                              .buttonText
+                                                                      ? Colors
+                                                                          .redAccent
+                                                                      : Colors
+                                                                          .black
+                                                                  : option.buttonText ==
+                                                                          'Hồng'
+                                                                      ? selectedColor ==
+                                                                              option
+                                                                                  .buttonText
+                                                                          ? Colors
+                                                                              .redAccent
+                                                                          : Colors
+                                                                              .green
+                                                                      : option.buttonText ==
+                                                                              'Xanh lá'
+                                                                          ? selectedColor == option.buttonText
+                                                                              ? Colors.redAccent
+                                                                              : Colors.green
+                                                                          : option.buttonText == 'Vàng'
+                                                                              ? selectedColor == option.buttonText
+                                                                                  ? Colors.redAccent
+                                                                                  : Colors.green
+                                                                              : option.buttonText == 'Cam'
+                                                                                  ? selectedColor == option.buttonText
+                                                                                      ? Colors.redAccent
+                                                                                      : Colors.green
+                                                                                  : selectedColor == option.buttonText
+                                                                                      ? Colors.redAccent
+                                                                                      : Colors.green,
+                                                  border: Border.all(color: Colors.black)),
+                                              //child: Text(option.buttonText),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                                Text(
+                                  'Size',
+                                  style: TextStyle(fontSize: 23,fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(height: 16),
-                                Text("Kích cỡ", style: TextStyle(fontSize: 18)),
-                                Row(
-                                  children: [
-                                    for (var option in radioOptionsSize)
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            for (var other
-                                                in radioOptionsSize) {
-                                              other.isSelected = false;
-                                            }
-                                            option.isSelected = true;
-                                            selectedSize = option.buttonText;
-                                          });
-                                        },
-                                        child: SquareRadioButtonItem(option),
-                                      ),
-                                  ],
+                                Wrap(
+                                  children: getUniqueSizesForColor(
+                                          selectedColor)
+                                      .map((option) => GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedSize =
+                                                    option.buttonText;
+                                              });
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              child: Container(
+                                                height: 50,
+                                                width: 50,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30),
+                                                    //
+                                                    color: selectedSize ==
+                                                            option.buttonText
+                                                        ? Colors.red[200]
+                                                        : Colors.white,
+                                                    // ),
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                child: Center(
+                                                    child: Text(
+                                                  option.buttonText,
+                                                  style:
+                                                      TextStyle(fontSize: 18),
+                                                )),
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
                                 ),
                                 SizedBox(height: 8),
                                 Text("Số lượng",
@@ -429,7 +532,7 @@ class _ProductDetailState extends State<ProductDetail> {
                                 ),
                                 SizedBox(height: 35),
                                 Text(
-                                  '${product.gia} VND ',
+                                  formatCurrency(double.parse(product.gia!)),
                                   style: TextStyle(
                                     fontSize: 30,
                                     fontWeight: FontWeight.bold,
@@ -462,7 +565,9 @@ class _ProductDetailState extends State<ProductDetail> {
                                   margin: EdgeInsets.all(10),
                                   height: 300,
                                   width: double.infinity,
-                                  child: CardReview(id_sp: widget.id_sp,),
+                                  child: CardReview(
+                                    id_sp: widget.id_sp,
+                                  ),
                                 ),
                               ],
                             ),

@@ -56,7 +56,7 @@ class _SparkBarChartExampleState extends State<SparkBarChartExample> {
   Future<void> fetchData() async {
     try {
       Response response = await dio
-          .get('https://humbly-sacred-mongrel.ngrok-free.app/api/getOrder3');
+          .get('https://buffalo-quality-ferret.ngrok-free.app/api/getOrder3');
       List<dynamic> data = response.data;
       List<Order> fetchedOrders =
           data.map((json) => Order.fromJson(json)).toList();
@@ -95,7 +95,7 @@ class _SparkBarChartExampleState extends State<SparkBarChartExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Spark Bar Chart Example'),
+        title: Text('Thống kê doanh thu'),
       ),
       body: Center(
         child: orders.isEmpty ? CircularProgressIndicator() : _buildChart(),

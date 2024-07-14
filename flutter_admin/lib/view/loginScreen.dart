@@ -1,12 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/src/material/icons.dart';
+import 'package:crypto/crypto.dart';  // Import the crypto package
+import 'package:flutter_admin/view/MainScreen.dart';
 import 'package:flutter_admin/view/accout.dart';
 import 'package:flutter_admin/view/homeScreen.dart';
 import 'package:flutter_admin/view/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Method/api.dart';
 import 'fogotPasswordScreen.dart';
 import 'registerScreen.dart';
@@ -24,9 +23,12 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
 
   void login() async {
+    var bytes = utf8.encode(passwordController.text);  // Convert password to bytes
+    var hashedPassword = sha256.convert(bytes).toString();  // Hash the password
+
     final data = {
       'email': emailController.text,
-      'password': passwordController.text
+      'password': hashedPassword,  // Use hashed password
     };
 
     final result = await API().postRequset(route: '/LoginAdmin', data: data);
@@ -46,16 +48,15 @@ class _LogInScreenState extends State<LogInScreen> {
         int quyen = response['user']['quyen'];
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(response['message'])));
-       // print(object)
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => Manscreec()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed: ${response['message']}')));
       }
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: ${result.statusCode}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${result.statusCode}')));
     }
   }
 
@@ -108,11 +109,6 @@ class _LogInScreenState extends State<LogInScreen> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                   )),
-              // validator: (value){
-              //   if(value==null || controller.emailController.text.isEmpty){
-              //     return "Vui lòng nhập email";
-              //   }
-              // },
             ),
           ),
           Container(
@@ -135,12 +131,6 @@ class _LogInScreenState extends State<LogInScreen> {
                       Icon(isObscure ? Icons.visibility : Icons.visibility_off),
                 ),
               ),
-              // validator: (value){
-              //   if(value==null || controller.passwordController.text.isEmpty){
-              //     return "Vui lòng nhập mat khau";
-              //   }
-              // },
-              // obscureText: true,
               obscureText: isObscure,
               obscuringCharacter: "•",
             ),
