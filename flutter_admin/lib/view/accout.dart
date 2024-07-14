@@ -1,14 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_admin/view/profile.dart';
+import 'package:flutter_admin/view/MainScreen.dart';
+import 'package:flutter_admin/view/editProduct.dart';
+import 'package:flutter_admin/view/homeScreen.dart';
+import 'package:flutter_admin/view/loginScreen.dart';
+import 'package:flutter_admin/view/EditProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Method/api.dart';
 import '../models/Category.dart';
 import 'addPromotion.dart';
 import 'cardPromotion.dart';
+import 'listCardProductOrder.dart';
 import 'listStaffInfo.dart';
 import 'listUserInfo.dart';
+import 'profile.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -19,6 +25,8 @@ class Account extends StatefulWidget {
 
 String? name;
 late Future<String?> futurename;
+late Future<String?> futureEmail;
+late Future<int?> futureQuyen;
 late Future<List<Category2>> futureCategory2;
 late Future<List<Category2>> futureCategory;
 late Future<List<Category2>> futureCategory3;
@@ -27,6 +35,14 @@ Future<String?> getUsername() async {
   name = preferences.getString('name');
   print('___________${name}');
   return name;
+}
+
+int? quyen;
+Future<int?> getUserQuyen() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  quyen = preferences.getInt('quyen');
+  print('___________${quyen}');
+  // return quyen;
 }
 
 class _AccountState extends State<Account> {
@@ -74,6 +90,15 @@ class _AccountState extends State<Account> {
     futureCategory2 = fetchData2();
     futureCategory3 = fetchData3();
     futurename = getUsername();
+    // futureEmail = getUserEmail();
+    futureQuyen = getUserQuyen();
+  }
+
+  String? email;
+  void getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    email = preferences.getString('email');
+    print('Email: $email');
   }
 
   Future<List<Category2>> fetchData() async {
@@ -197,22 +222,29 @@ class _AccountState extends State<Account> {
     return categories3; // Return list of Category2 objects
   }
 
+  void logout() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Manscreec()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text("TÀI KHOẢN"),
-        ]),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        appBar: AppBar(
+          title:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text("TÀI KHOẢN"),
+          ]),
+        ),
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage('assets/hinh.jpg'),
+                backgroundImage: AssetImage('assets/imageicon.jpg'),
                 radius: 30,
               ),
               SizedBox(
@@ -222,7 +254,7 @@ class _AccountState extends State<Account> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${name}",
+                    "${name != null ? name : 'Tên tài khoản'}",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   InkWell(
@@ -249,7 +281,7 @@ class _AccountState extends State<Account> {
           // SizedBox(
           //   height: 10,
           // ),
-          Container(
+         Container(
               child: Padding(
                 padding: const EdgeInsets.all(7.0),
                 child: Row(
@@ -258,7 +290,11 @@ class _AccountState extends State<Account> {
                     Column(
                       children: [
                         IconButton(
-                            onPressed: () {},
+                            onPressed: ()  {Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ListCardProductOrder(initialIndex: 0,email: email,)));},
                             icon: Icon(Icons.wallet_outlined)),
                         Text("Chờ xác nhận",
                             style: TextStyle(fontWeight: FontWeight.bold))
@@ -267,7 +303,11 @@ class _AccountState extends State<Account> {
                     Column(
                       children: [
                         IconButton(
-                            onPressed: () {},
+                            onPressed: () {Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ListCardProductOrder(initialIndex: 1,email: email,)));},
                             icon: Icon(Icons.work_history_outlined)),
                         Text("Đang xử lý",
                             style: TextStyle(fontWeight: FontWeight.bold))
@@ -276,7 +316,11 @@ class _AccountState extends State<Account> {
                     Column(
                       children: [
                         IconButton(
-                            onPressed: () {},
+                            onPressed: ()  {Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ListCardProductOrder(initialIndex: 2,email: email,)));},
                             icon: Icon(Icons.departure_board_rounded)),
                         Text("Đang giao",
                             style: TextStyle(fontWeight: FontWeight.bold)),
@@ -285,7 +329,11 @@ class _AccountState extends State<Account> {
                     Column(
                       children: [
                         IconButton(
-                            onPressed: () {},
+                            onPressed: () {Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ListCardProductOrder(initialIndex: 3,email: email,)));},
                             icon: Icon(Icons.add_task_outlined)),
                         Text("Đã giao",
                             style: TextStyle(fontWeight: FontWeight.bold)),
@@ -294,7 +342,11 @@ class _AccountState extends State<Account> {
                     Column(
                       children: [
                         IconButton(
-                            onPressed: () {}, icon: Icon(Icons.cached_sharp)),
+                            onPressed: ()  {Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ListCardProductOrder(initialIndex: 4,email: email,)));}, icon: Icon(Icons.cached_sharp)),
                         Text("Trả hàng",
                             style: TextStyle(fontWeight: FontWeight.bold))
                       ],
@@ -315,313 +367,35 @@ class _AccountState extends State<Account> {
                 ),
               )),
           SizedBox(
-            height: 10,
+            height: 30,
           ),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: InkWell(
-                child: Container(
-                    padding: const EdgeInsets.all(5.0),
-                    height: 50,
-                    width: 400,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(width: 1.0, color: Colors.black),
-                      ),
-                    ),
-                    child: Text('Thêm khuyến mãi',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16))),
+          Column(
+            children: [
+              InkWell(
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return FutureBuilder<List<Category2>>(
-                        future: futureCategory,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return Center(child: Text('No data available'));
-                          } else {
-                            List<Category2> categories = snapshot.data!;
-                            return AlertDialog(
-                              backgroundColor: Colors.white,
-                              title: Column(
-                                children: [
-                                  ButtonBar(
-                                    alignment: MainAxisAlignment.center,
-                                    children: [
-                                      for (int i = 0;
-                                          i < categories.length;
-                                          i++)
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return FutureBuilder<
-                                                    List<Category2>>(
-                                                  future: futureCategory2,
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot
-                                                            .connectionState ==
-                                                        ConnectionState
-                                                            .waiting) {
-                                                      return Center(
-                                                          child:
-                                                              CircularProgressIndicator());
-                                                    } else if (snapshot
-                                                        .hasError) {
-                                                      return Center(
-                                                          child: Text(
-                                                              'Error: ${snapshot.error}'));
-                                                    } else if (!snapshot
-                                                            .hasData ||
-                                                        snapshot
-                                                            .data!.isEmpty) {
-                                                      return Center(
-                                                          child: Text(
-                                                              'No data available'));
-                                                    } else {
-                                                      // List<Category2> categories2t = snapshot.data!;
-                                                      // categories2t = categories2.where((category) => category.id_cha == categories[i].id_danhmuc).toList();
-                                                      // List<Category2>
-                                                      List<Category2>
-                                                          categories22 =
-                                                          snapshot.data!;
-                                                      categories22 = categories2
-                                                          .where((category) =>
-                                                              category.id_cha ==
-                                                              categories[i]
-                                                                  .id_danhmuc)
-                                                          .toList();
-                                                      return AlertDialog(
-                                                        title: Column(
-                                                          children: [
-                                                            ButtonBar(
-                                                              alignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                for (int j = 0;
-                                                                    j <
-                                                                        categories22
-                                                                            .length;
-                                                                    j++)
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      showDialog(
-                                                                        context:
-                                                                            context,
-                                                                        builder:
-                                                                            (BuildContext
-                                                                                context) {
-                                                                          return FutureBuilder<
-                                                                              List<Category2>>(
-                                                                            future:
-                                                                                futureCategory3,
-                                                                            builder:
-                                                                                (context, snapshot) {
-                                                                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                return Center(child: CircularProgressIndicator());
-                                                                              } else if (snapshot.hasError) {
-                                                                                return Center(child: Text('Error: ${snapshot.error}'));
-                                                                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                                                                return Center(child: Text('No data available'));
-                                                                              } else {
-                                                                                //List<Category2>
-                                                                                List<Category2> categories32 = snapshot.data!;
-                                                                                categories32 = categories3.where((category) => category.id_cha == categories22[j].id_danhmuc).toList();
-                                                                                //print('_____________-${categories32}');
-                                                                                return AlertDialog(
-                                                                                  title: Column(
-                                                                                    children: [
-                                                                                      ButtonBar(
-                                                                                        alignment: MainAxisAlignment.center,
-                                                                                        children: [
-                                                                                          for (int h = 0; h < categories32.length; h++)
-                                                                                            if (categories32.isNotEmpty)
-                                                                                              ElevatedButton(
-                                                                                                child: Text(
-                                                                                                  categories32.isNotEmpty
-                                                                                                      ? categories32[h]?.cap == 3
-                                                                                                          ? categories32[h]?.tendanhmuc ?? 'khong'
-                                                                                                          : 'khong'
-                                                                                                      : 'Loading...',
-                                                                                                ),
-                                                                                                onPressed: () {
-                                                                                                  Navigator.push(
-                                                                                                      context,
-                                                                                                      MaterialPageRoute(
-                                                                                                          builder: (context) => AddPromotion(
-                                                                                                                id_danhmuc: categories32[h]?.id_danhmuc,
-                                                                                                              )));
-                                                                                                },
-                                                                                              )
-                                                                                        ],
-                                                                                      )
-                                                                                    ],
-                                                                                  ),
-                                                                                );
-                                                                              }
-                                                                            },
-                                                                          );
-                                                                        },
-                                                                      );
-                                                                    },
-                                                                    child: Text(
-                                                                      categories22
-                                                                              .isNotEmpty
-                                                                          ? categories22[j]?.cap == 2
-                                                                              ? categories22[j]?.tendanhmuc ?? 'khong'
-                                                                              : 'khong'
-                                                                          : 'Loading...',
-                                                                    ),
-                                                                  )
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: Text(
-                                            categories.isNotEmpty
-                                                ? categories[i]?.id_cha == 0 &&
-                                                        categories[i]?.cap == 1
-                                                    ? categories[i]
-                                                            ?.tendanhmuc ??
-                                                        'khong'
-                                                    : 'khong'
-                                                : 'Loading...',
-                                          ),
-                                        )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      );
-                    },
-                  );
-                }),
-          ),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CardPromotion()));
-              },
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                height: 50,
-                width: 400,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(width: 1.0, color: Colors.black),
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfileOut(
+                                emails: name,
+                              )));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(5.0),
+                  height: 50,
+                  width: 400,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(width: 1.0, color: Colors.black),
+                    ),
                   ),
-                ),
-                child: Text('Quản lý khuyến mãi',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-            ),
-          ),
-
-          SizedBox(
-            height: 10,
-          ),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CardStaffInfo()));
-              },
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                height: 50,
-                width: 400,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(width: 1.0, color: Colors.black),
-                  ),
-                ),
-                child: Text('Quản lý nhân viên',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CardUserInfo()));
-              },
-              child: Container(
-                padding: const EdgeInsets.all(5.0),
-                height: 50,
-                width: 400,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(width: 1.0, color: Colors.black),
-                  ),
-                ),
-                child: Text('Quản lý khách hàng',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(5.0),
-              height: 50,
-              width: 400,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 1.0, color: Colors.black),
+                  child: Text('Tài khoản',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
-              child: Text('Đăng nhập',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ]));
   }
 }

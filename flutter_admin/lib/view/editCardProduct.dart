@@ -6,6 +6,7 @@ import 'package:flutter_admin/view/homeScreen.dart';
 
 import '../Method/api.dart';
 import '../models/ProductVaritation.dart';
+import 'editImage.dart';
 
 class ProductCard extends StatefulWidget {
   final String? color;
@@ -114,29 +115,28 @@ class _ProductCardState extends State<ProductCard> {
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: _image != null
-                            ? Image.file(
-                                _image!,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              )
-                            : widget.image != null
-                                ? Image.network(
-                                    widget.image!,
-                                    height: 100,
-                                    width: 100,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Icon(Icons.image, size: 100),
-                      ),
+                      // GestureDetector(
+                      //   onTap: _pickImage,
+                      //   child: _image != null
+                      //       ? Image.file(
+                      //           _image!,
+                      //           height: 100,
+                      //           width: 100,
+                      //           fit: BoxFit.cover,
+                      //         )
+                      //       : widget.image != null
+                      //           ? Image.network(
+                      //               widget.image!,
+                      //               height: 100,
+                      //               width: 100,
+                      //               fit: BoxFit.cover,
+                      //             )
+                      //           : Icon(Icons.image, size: 100),
+                      // ),
                       SizedBox(height: 10),
                       Text('Color: ${widget.color}',
                           style: TextStyle(fontSize: 16)),
-                      Text('Size: ${widget.size}',
-                          style: TextStyle(fontSize: 16)),
+                      Text('Size: ${widget.size}', style: TextStyle(fontSize: 16)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -161,20 +161,14 @@ class _ProductCardState extends State<ProductCard> {
                     ],
                   ),
                 )
-              : SizedBox(
-                  height: 1,
-                ),
+              : SizedBox(height: 1),
         ),
         Positioned(
           right: 0,
           child: IconButton(
-              icon: Icon(Icons.close_sharp, color: Colors.red),
-              onPressed: () {
-                  _showDeleteDialog;
-                setState(() {
-                  
-                });
-              }),
+            icon: Icon(Icons.close_sharp, color: Colors.red),
+            onPressed: _showDeleteDialog,
+          ),
         ),
       ],
     );
@@ -185,6 +179,7 @@ class EditCardProduct extends StatefulWidget {
   final int? id_sp;
 
   const EditCardProduct({Key? key, this.id_sp}) : super(key: key);
+
   @override
   _EditCardProductState createState() => _EditCardProductState();
 }
@@ -194,6 +189,7 @@ class _EditCardProductState extends State<EditCardProduct> {
   Dio dio = Dio();
   List<Producvaritation> productVariations = [];
   List<int> id_bienthe = [];
+
   @override
   void initState() {
     super.initState();
@@ -217,12 +213,10 @@ class _EditCardProductState extends State<EditCardProduct> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {});
+        setState(() {
+          productVariations.removeWhere((item) => item.id == id);
+        });
         print('Profile updated successfully');
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: ((context) => HomeScreen())),
-        //);
       } else {
         print('Failed to update profile: ${response.data}');
       }
@@ -264,12 +258,6 @@ class _EditCardProductState extends State<EditCardProduct> {
     print('Product Variations: ${productVariations}');
     return productVariations;
   }
-
-  // void _deleteProduct(int index) {
-  //   setState(() {
-  //     productVariations.removeAt(index);
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -322,7 +310,7 @@ class _EditCardProductState extends State<EditCardProduct> {
           ElevatedButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()));
+                  MaterialPageRoute(builder: (context) => EditImage(id_sp: widget.id_sp,)));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
@@ -336,8 +324,8 @@ class _EditCardProductState extends State<EditCardProduct> {
                 "Hoàn tất",
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
               ),
             ),
           ),

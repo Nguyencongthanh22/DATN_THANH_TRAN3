@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/view/accout.dart';
 import 'package:flutter_admin/view/chart.dart';
-
-import 'accout.dart';
+import 'package:flutter_admin/view/loginScreen.dart';
+ // Đã sửa từ accout.dart thành account.dart
 import 'homescreen.dart';
 
 void main() {
@@ -9,7 +10,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key); // Sửa từ super.key thành Key? key
 
   @override
   Widget build(BuildContext context) {
@@ -25,39 +26,38 @@ class MyApp extends StatelessWidget {
 }
 
 class Manscreec extends StatefulWidget {
-  const Manscreec({super.key});
+  const Manscreec({Key? key}) : super(key: key); // Sửa từ super.key thành Key? key
 
   @override
   State<Manscreec> createState() => _ManscreecState();
 }
 
-class _ManscreecState extends State<Manscreec> {
+class _ManscreecState extends State<Manscreec>
+    with AutomaticKeepAliveClientMixin<Manscreec> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
+  @override
+  bool get wantKeepAlive => true; // Giữ lại trạng thái của Manscreec khi chuyển tab
+final List<Widget> _pages = [
     const HomeScreen(),
     SparkBarChartExample(),
     //const NotificationsScreen(),
     const Account(),
   ];
-
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Đảm bảo gọi hàm build của mixin
+
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
-         onTap: (index) async {
-        //   if (index == 3) {
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (context) => const RegisterScreen()),
-        //     );
-        //     return;
-        //   }
-           setState(() {
-             _currentIndex = index;
+        onTap: (index) {
+                
+           
+          setState(() {
+            _currentIndex = index;
           });
         },
         selectedLabelStyle: TextStyle(color: Colors.lightBlue[200]),
@@ -75,10 +75,6 @@ class _ManscreecState extends State<Manscreec> {
             icon: Icon(Icons.category),
             label: 'Thống kê',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.notifications),
-          //   label: 'Thông báo',
-          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Tài khoản',

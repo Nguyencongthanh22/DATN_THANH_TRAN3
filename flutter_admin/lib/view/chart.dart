@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:dio/dio.dart';
 
+import '../Method/api.dart';
 import '../models/Order.dart';
 
 Dio dio = Dio();
@@ -31,8 +32,7 @@ class Order {
       email: json['email'] ?? '',
       tongtien: json['tongtien'] ?? '',
       diachi: json['diachi'] ?? '',
-      ngaydat:
-          json['ngaydat'] ?? '', // Adjust field name based on your Laravel API
+      ngaydat: json['ngaydat'] ?? '', // Adjust field name based on your Laravel API
       trangthai: json['trangthai'] ?? '',
       email_nv: json['email_nv'] ?? '',
     );
@@ -45,26 +45,48 @@ class SparkBarChartExample extends StatefulWidget {
 }
 
 class _SparkBarChartExampleState extends State<SparkBarChartExample> {
-  List<Order> orders = [];
+  late Future<List<Order>> futureOrder;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    futureOrder = _fetchOrdersAdmin();
   }
 
-  Future<void> fetchData() async {
+  Future<List<Order>> _fetchOrdersAdmin() async {
     try {
-      Response response = await dio
-          .get('https://buffalo-quality-ferret.ngrok-free.app/api/getOrder3');
-      List<dynamic> data = response.data;
-      List<Order> fetchedOrders =
-          data.map((json) => Order.fromJson(json)).toList();
-      setState(() {
-        orders = fetchedOrders;
-      });
+      String api = API().getUrl('/getOrderAdmin');
+      print('Fetching data from: $api');
+
+      final response = await Dio().get(
+        api,
+        queryParameters: {'trangthai': 'dagiao'},
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ),
+      );
+
+      print('Response received: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = response.data;
+        print('Parsed response data: $responseData');
+
+        List<dynamic> data = responseData['orders'];
+        print('Orders data: $data');
+
+        List<Order> orders = data.map((json) => Order.fromJson(json)).toList();
+        print('Parsed orders: $orders');
+
+        return orders;
+      } else {
+        print('Error fetching data: ${response.statusCode}');
+        throw Exception('Failed to load data');
+      }
     } catch (e) {
       print('Error fetching data: $e');
+      throw Exception('Failed to load data');
     }
   }
 
@@ -98,24 +120,37 @@ class _SparkBarChartExampleState extends State<SparkBarChartExample> {
         title: Text('Thống kê doanh thu'),
       ),
       body: Center(
-        child: orders.isEmpty ? CircularProgressIndicator() : _buildChart(),
+        child: FutureBuilder<List<Order>>(
+          future: futureOrder,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Text('Không tìm thấy doanh thu');
+            } else {
+              List<Order> orders = snapshot.data!;
+              return _buildChart(orders);
+            }
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildChart() {
-    // Tính toán tổng `tongtien` theo tháng
+  Widget _buildChart(List<Order> orders) {
+    // Calculate total `tongtien` by month
     Map<String, double> monthlyTotal = calculateMonthlyTotal(orders);
 
-    // Chuyển đổi thành danh sách `Series` cho biểu đồ
+    // Convert to list of `Series` for the chart
     List<charts.Series<MapEntry<String, double>, String>> seriesList = [
       charts.Series<MapEntry<String, double>, String>(
         id: 'Monthly Orders',
         domainFn: (entry, _) => entry.key,
         measureFn: (entry, _) => entry.value,
         data: monthlyTotal.entries.toList(),
-        labelAccessorFn: (entry, _) =>
-            '${entry.value}', // Hiển thị giá trị trên cột
+        labelAccessorFn: (entry, _) => '${entry.value}', // Display value on the bar
       ),
     ];
 
@@ -124,11 +159,11 @@ class _SparkBarChartExampleState extends State<SparkBarChartExample> {
       child: charts.BarChart(
         seriesList,
         animate: true,
-        // Renderer cấu hình để làm cho biểu đồ nổi bật hơn
+        // Renderer config for a more prominent chart
         defaultRenderer: charts.BarRendererConfig(
           barRendererDecorator: charts.BarLabelDecorator<String>(),
         ),
-        // Ẩn trục miền
+        // Hide the domain axis
         domainAxis: charts.OrdinalAxisSpec(
           renderSpec: charts.NoneRenderSpec(),
         ),

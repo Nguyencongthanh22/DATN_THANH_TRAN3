@@ -1,11 +1,11 @@
 class Image2 {
-  int? id_anh;
+  int? id;
   String? image;
   int? id_sp;
   int? id_color;
 
   Image2({
-    required this.id_anh,
+    required this.id,
     required this.image,
     required this.id_sp,
     required this.id_color,
@@ -13,7 +13,7 @@ class Image2 {
 
   Map<String, dynamic> toMap() {
     return {
-      "id_anh": id_anh,
+      "id": id,
       "url": image,
       "id_sp": id_sp,
       "id_color": id_color,
@@ -22,7 +22,7 @@ class Image2 {
 
   factory Image2.fromJson(Map<String, dynamic> json) {
     return Image2(
-      id_anh: json['id_anh'],
+      id: json['id'],
       image: json['image'],
       id_sp: json['id_sp'],
       id_color: json['id_color'],

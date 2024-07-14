@@ -8,7 +8,6 @@ import '../models/Category.dart';
 import 'package:flutter_admin/models/Product.dart';
 import '../models/Image.dart';
 import 'addProduct.dart';
-import 'package:flutter_admin/view/cardProduct.dart';
 
 import 'productDetail.dart';
 
@@ -757,7 +756,7 @@ class _MainScreenState extends State<HomeScreen> {
                                                                   DecorationImage(
                                                                 image: 
                                                                     NetworkImage(
-                                                                  'https://buffalo-quality-ferret.ngrok-free.app/storage/${productImages[imgIndex].image}',
+                                                                  'https://troll-touched-basically.ngrok-free.app/storage/${productImages[imgIndex].image}',
                                                                 ), fit: BoxFit.cover,
                                                               ),
                                                             ),
@@ -848,7 +847,7 @@ class CustomSearchDelegate extends SearchDelegate<String> {
               itemBuilder: (context, index) {
                 var product = snapshot.data![index];
                 var imageUrl = product.images.isNotEmpty
-                    ? 'https://humbly-sacred-mongrel.ngrok-free.app/storage/${product.images[0].image}' // Lấy hình ảnh đầu tiên của sản phẩm
+                    ? 'https://troll-touched-basically.ngrok-free.app/storage/${product.images[0].image}' // Lấy hình ảnh đầu tiên của sản phẩm
                     : ''; // Xử lý trường hợp không có hình ảnh
 
                 return Card(

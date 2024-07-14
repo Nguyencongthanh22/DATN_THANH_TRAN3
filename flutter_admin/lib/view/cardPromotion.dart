@@ -11,8 +11,8 @@ import '../models/Coupon.dart';
 import 'detailPromotion.dart';
 
 class CardPromotion extends StatefulWidget {
-  const CardPromotion({super.key});
-
+  const CardPromotion({super.key, this.quyen});
+  final int? quyen;
   @override
   State<CardPromotion> createState() => _CardStaffInfoState();
 }
@@ -35,7 +35,7 @@ class _CardStaffInfoState extends State<CardPromotion> {
         ));
     if (respone.statusCode == 200) {
       List<dynamic> data = respone.data;
-      print('_______________${data}');
+      print('_______________${widget.quyen}');
       List<Coupon> fechdata =
           data.map((json) => Coupon.fromJson(json)).toList();
       user.addAll(fechdata);
@@ -76,16 +76,17 @@ class _CardStaffInfoState extends State<CardPromotion> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        child: InkWell(
+                        child:  InkWell(
                           onTap: () {
-                            //Navigator.push(
-                             // context,
-                              // MaterialPageRoute(
-                              //   builder: (context) => DetailPromotion(
-                              //     id: snapshot.data![index].id,
-                              //   ),
-                              // ),
-                           // );
+                            widget.quyen==0?
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailPromotion(
+                                  id: snapshot.data![index].id,
+                                ),
+                              ),
+                            ):'';
                           },
                           child: Container(
                             margin: const EdgeInsets.all(20),

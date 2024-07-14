@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:crypto/crypto.dart';  // Import the crypto package
+import 'package:crypto/crypto.dart'; // Import the crypto package
 import 'package:flutter_admin/view/MainScreen.dart';
 import 'package:flutter_admin/view/accout.dart';
 import 'package:flutter_admin/view/homeScreen.dart';
-import 'package:flutter_admin/view/profile.dart';
+import 'package:flutter_admin/view/EditProfile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
 import 'fogotPasswordScreen.dart';
@@ -23,12 +23,13 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
 
   void login() async {
-    var bytes = utf8.encode(passwordController.text);  // Convert password to bytes
-    var hashedPassword = sha256.convert(bytes).toString();  // Hash the password
+    var bytes =
+        utf8.encode(passwordController.text); // Convert password to bytes
+    var hashedPassword = sha256.convert(bytes).toString(); // Hash the password
 
     final data = {
       'email': emailController.text,
-      'password': hashedPassword,  // Use hashed password
+      'password': hashedPassword, // Use hashed password
     };
 
     final result = await API().postRequset(route: '/LoginAdmin', data: data);
@@ -55,8 +56,8 @@ class _LogInScreenState extends State<LogInScreen> {
             SnackBar(content: Text('Login failed: ${response['message']}')));
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${result.statusCode}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: ${result.statusCode}')));
     }
   }
 
@@ -71,7 +72,10 @@ class _LogInScreenState extends State<LogInScreen> {
               color: Colors.black, fontSize: 25, fontWeight: FontWeight.w400),
         ),
         leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Account()));
+            },
             icon: const Icon(
               Icons.arrow_back,
               color: Colors.red,

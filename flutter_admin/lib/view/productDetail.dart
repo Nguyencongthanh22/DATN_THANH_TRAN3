@@ -275,16 +275,18 @@ class _ProductDetailState extends State<ProductDetail> {
                                   ),
                                 ),
                                 Container(
-                                  height: 250,
+                                  height: 400,
                                   width: double.infinity,
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: images.length,
                                     itemBuilder: (context, index) {
                                       return Container(
+                                        width: 400,
+                                        height: 400,
                                         margin: EdgeInsets.only(right: 16),
                                         child: Image.network(
-                                          'https://humbly-sacred-mongrel.ngrok-free.app/storage/${images[index].image}',
+                                          'https://troll-touched-basically.ngrok-free.app/storage/${images[index].image}',
                                           fit: BoxFit.cover,
                                         ),
                                       );

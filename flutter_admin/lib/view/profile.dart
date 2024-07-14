@@ -1,21 +1,31 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_admin/view/homeScreen.dart';
+import 'package:flutter_admin/view/loginScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Method/api.dart';
+import '../models/Category.dart';
 import '../models/user.dart';
 import 'package:intl/intl.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({
-    super.key,
-  });
+import 'MainScreen.dart';
+import 'addPromotion.dart';
+import 'cardPromotion.dart';
+import 'listStaffInfo.dart';
+import 'listUserInfo.dart';
 
+class ProfileOut extends StatefulWidget {
+  const ProfileOut({
+    super.key,
+    this.emails,
+  });
+  final String? emails;
   @override
-  State<Profile> createState() => _ProfileState();
+  State<ProfileOut> createState() => _ProfileState();
 }
 
 List<String> _suggestions = [];
@@ -23,136 +33,212 @@ late Future<int?> futureQuyen;
 late Future<void> update;
 late Future<String?> futureEmail;
 
-class _ProfileState extends State<Profile> {
-  TextEditingController _nameController = TextEditingController();
-  //TextEditingController _emailController = TextEditingController();
-  TextEditingController _addressController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _ngaySinhController = TextEditingController();
-
-  DateTime? ngaysinh;
-  String? Gender;
-  int? Quyen1;
-  String test = '';
-  User? user;
-  Dio dio = Dio();
-  String? email;
-  String dropdownValueNam = '1';
-  String namegender = 'Nam';
-  Map<String, String> GenderValueMap = {
-    '1': 'Nam',
-    '2': 'Nữ',
-    '3': 'Khác',
-  };
-
-  Future<String?> getUserEmail() async {
+class _ProfileState extends State<ProfileOut> {
+  String? name;
+  late Future<String?> futurename;
+  late Future<String?> futureEmail;
+  late Future<int?> futureQuyen;
+  late Future<List<Category2>> futureCategory2;
+  late Future<List<Category2>> futureCategory;
+  late Future<List<Category2>> futureCategory3;
+  Future<String?> getUsername() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    email = preferences.getString('email');
-    print('___________${email}');
-    return email;
-  }
-
-  String dropdownValueQuyen = '0';
-  @override
-  @override
-  void initState() {
-    super.initState();
-    //  service = AuthService();
-    futureQuyen = getUserQuyen();
-    futureEmail = getUserEmail();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      email = await futureEmail;
-      if (email != null) {
-        Map<String, dynamic> formData = {
-          "email": email,
-        };
-        String api = API().getUrl('/profileAdmin');
-        final response = await dio.get(api,
-            data: formData,
-            options: Options(
-              headers: {
-                'Accept': 'application/json',
-              },
-            ));
-        print('Lấy data profile: ${response.data}');
-        setState(() {
-          user = User.fromJson(jsonDecode(jsonEncode(response.data)));
-          _nameController.text = user!.name ?? '';
-          _addressController.text = user!.diachi ?? '';
-          _phoneController.text = user!.sodienthoai ?? '';
-          Gender = user!.gioitinh ?? '';
-          Quyen1 = user!.quyen;
-          ngaysinh = user!.ngaysinh;
-        });
-      } else {}
-    });
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _addressController.dispose();
-    _phoneController.dispose();
-    _ngaySinhController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: ngaysinh ?? DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        ngaysinh = picked;
-        _ngaySinhController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
-  }
-
-  Future<void> updateProfile() async {
-    String api = API().getUrl('/updateProfile');
-    try {
-      final response = await Dio().put(
-        api,
-        data: {
-          'email': email,
-          'name': _nameController.text,
-          'diachi': _addressController.text,
-          'sodienthoai': _phoneController.text,
-          'ngaysinh':
-              _ngaySinhController.text, // Đảm bảo là ngaysinh là chuỗi ở đây
-          'gioitinh': namegender,
-        },
-        options: Options(
-          headers: {
-            'Accept': 'application/json',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        print('Profile updated successfully');
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: ((context) => HomeScreen())),
-        );
-      } else {
-        print('Failed to update profile: ${response.data}');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+    name = preferences.getString('name');
+    print('___________${name}');
+    return name;
   }
 
   int? quyen;
   Future<int?> getUserQuyen() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     quyen = preferences.getInt('quyen');
-    print('_____________________________${quyen}');
-    return quyen;
+    print('___________${quyen}');
+     return quyen;
+  }
+
+  Dio dio = Dio();
+  List<int> categoryIds = [1, 2, 3, 4];
+  List<int> categoryid_cha = [0];
+  List<int> categoryIdscha2 = [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32
+  ];
+  List<int> categorycap = [1];
+  List<int> categorycap2 = [2];
+  List<int> categorycap3 = [3];
+  List<Category2> categories2 = []; // Danh sách các id danh mục
+  List<Category2> categories3 = [];
+  void initState() {
+    super.initState();
+    futureCategory = fetchData();
+    futureCategory2 = fetchData2();
+    futureCategory3 = fetchData3();
+    futurename = getUsername();
+    // futureEmail = getUserEmail();
+    futureQuyen = getUserQuyen();
+  }
+
+  String? email;
+  void getUserEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    email = preferences.getString('email');
+    print('Email: $email');
+  }
+
+  Future<List<Category2>> fetchData() async {
+    List<Category2> categories = [];
+
+    try {
+      // Gửi yêu cầu GET cho từng id danh mục trong danh sách
+      for (int id in categoryIds) {
+        for (int id_cha in categoryid_cha) {
+          for (int cap in categorycap) {
+            String api = API().getUrl('/Category2');
+            final response = await dio.get(
+              api,
+              queryParameters: {'id_danhmuc': id, 'id_cha': id_cha, 'cap': cap},
+              options: Options(
+                headers: {
+                  'Accept': 'application/json',
+                },
+              ),
+            );
+            print('________________${response.data}');
+            // Check if response data is valid
+            if (response.statusCode == 200) {
+              Category2 category = Category2.fromJson(response.data);
+              if (category.id_danhmuc != null) {
+                categories.add(category);
+              } else {
+                continue;
+              }
+            } else {
+              print('Error fetching data: ${response.statusCode}');
+              continue;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+
+    return categories; // Return list of Category objects
+  }
+
+  Future<List<Category2>> fetchData2() async {
+    try {
+      for (int id_cha in categoryIds) {
+        for (int cap in categorycap2) {
+          String api = API().getUrl('/Showid');
+          final response = await dio.get(
+            api,
+            queryParameters: {'id_cha': id_cha, 'cap': cap},
+            options: Options(
+              headers: {
+                'Accept': 'application/json',
+              },
+            ),
+          );
+
+          // Check if response data is valid
+          if (response.statusCode == 200) {
+            // Handle response.data as a list of objects
+            List<dynamic> dataList = response.data as List<dynamic>;
+            for (var data in dataList) {
+              // Ensure data is of type Map<String, dynamic>
+              if (data is Map<String, dynamic>) {
+                Category2 category2 = Category2.fromJson(data);
+                if (category2.id_danhmuc != null) {
+                  categories2.add(category2);
+                }
+              }
+            }
+          } else {
+            print('Error fetching data: ${response.statusCode}');
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+
+    return categories2; // Return list of Category2 objects
+  }
+
+  Future<List<Category2>> fetchData3() async {
+    try {
+      for (int id_cha in categoryIdscha2) {
+        for (int cap in categorycap3) {
+          String api = API().getUrl('/Showid2');
+          final response = await dio.get(
+            api,
+            queryParameters: {'id_cha': id_cha, 'cap': cap},
+            options: Options(
+              headers: {
+                'Accept': 'application/json',
+              },
+            ),
+          );
+
+          // Check if response data is valid
+          if (response.statusCode == 200) {
+            // Handle response.data as a list of objects
+            List<dynamic> dataList = response.data as List<dynamic>;
+            for (var data in dataList) {
+              // Ensure data is of type Map<String, dynamic>
+              if (data is Map<String, dynamic>) {
+                Category2 category32 = Category2.fromJson(data);
+                if (category32.id_danhmuc != null) {
+                  categories3.add(category32);
+                }
+              }
+            }
+          } else {
+            print('Error fetching data: ${response.statusCode}');
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+
+    return categories3; // Return list of Category2 objects
+  }
+
+  void logout() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Manscreec()),
+    );
   }
 
   @override
@@ -171,188 +257,18 @@ class _ProfileState extends State<Profile> {
         ),
         body: SingleChildScrollView(
             padding: EdgeInsets.all(15),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Padding(padding: EdgeInsets.all(10)),
-                  Text(
-                    'TÀI KHOẢN: ${email}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "QUYỀN: ",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                      Text(
-                        '${quyen == 1 ? 'Quản lý' : 'Nhân viên'}',
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "TÊN",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    height: 50,
-                    child: TextFormField(
-                      controller: _nameController,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      cursorColor: Colors.white,
-                      decoration: InputDecoration(
-                        filled: true,
-                        labelText: "Vui lòng nhập tên của bạn",
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        labelStyle: const TextStyle(color: Colors.black45),
-                        fillColor: Colors.grey[100],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "SỐ ĐIỆN THOẠI",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    height: 50,
-                    child: TextFormField(
-                      controller: _phoneController,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      cursorColor: Colors.white,
-                      decoration: InputDecoration(
-                        filled: true,
-                        labelText: "Vui lòng nhập số điện thoại của bạn",
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        labelStyle: const TextStyle(color: Colors.black45),
-                        fillColor: Colors.grey[100],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "ĐỊA CHỈ",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Container(
-                    height: 50,
-                    child: TextFormField(
-                      controller: _addressController,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      cursorColor: Colors.white,
-                      decoration: InputDecoration(
-                        filled: true,
-                        labelText: "Vui lòng nhập địa chỉ của bạn",
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        labelStyle: const TextStyle(color: Colors.black45),
-                        fillColor: Colors.grey[100],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-
-                  Text(
-                    "NGÀY SINH ${ngaysinh}",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 5),
-                  TextFormField(
-                    controller: _ngaySinhController,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                      await _selectDate(context);
-                    },
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    cursorColor: Colors.white,
-                    decoration: InputDecoration(
-                      filled: true,
-                      labelText: "Vui lòng nhập ngày sinh của bạn",
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                      labelStyle: TextStyle(color: Colors.black45),
-                      fillColor: Colors.grey[100],
-                    ),
-                  ),
-                  Text(
-                    "GIỚI TÍNH: ${Gender}",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey, width: 1),
-                      borderRadius: BorderRadius.circular(0),
-                    ),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: dropdownValueNam,
-                      icon: const Icon(Icons.arrow_drop_down),
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownValueNam = newValue!;
-                          namegender = GenderValueMap[newValue]!;
-                        });
-                      },
-                      items: GenderValueMap.keys.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(GenderValueMap[value]!),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: widget.emails == null
+                ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     ElevatedButton(
                         onPressed: () async {
-                          await updateProfile();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LogInScreen()));
+                          //logout();
                         },
                         child: Text(
-                          "LƯU",
+                          "Đăng Nhập",
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -368,6 +284,334 @@ class _ProfileState extends State<Profile> {
                           ),
                         ))
                   ])
-                ])));
+                : Column(
+                    children: [
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: InkWell(
+                            child: Container(
+                                padding: const EdgeInsets.all(5.0),
+                                height: 50,
+                                width: 400,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        width: 1.0, color: Colors.black),
+                                  ),
+                                ),
+                                child: Text('Thêm khuyến mãi',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16))),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return FutureBuilder<List<Category2>>(
+                                    future: futureCategory,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                                'Error: ${snapshot.error}'));
+                                      } else if (!snapshot.hasData ||
+                                          snapshot.data!.isEmpty) {
+                                        return Center(
+                                            child: Text('No data available'));
+                                      } else {
+                                        List<Category2> categories =
+                                            snapshot.data!;
+                                        return AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          title: Column(
+                                            children: [
+                                              ButtonBar(
+                                                alignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  for (int i = 0;
+                                                      i < categories.length;
+                                                      i++)
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return FutureBuilder<
+                                                                List<
+                                                                    Category2>>(
+                                                              future:
+                                                                  futureCategory2,
+                                                              builder: (context,
+                                                                  snapshot) {
+                                                                if (snapshot
+                                                                        .connectionState ==
+                                                                    ConnectionState
+                                                                        .waiting) {
+                                                                  return Center(
+                                                                      child:
+                                                                          CircularProgressIndicator());
+                                                                } else if (snapshot
+                                                                    .hasError) {
+                                                                  return Center(
+                                                                      child: Text(
+                                                                          'Error: ${snapshot.error}'));
+                                                                } else if (!snapshot
+                                                                        .hasData ||
+                                                                    snapshot
+                                                                        .data!
+                                                                        .isEmpty) {
+                                                                  return Center(
+                                                                      child: Text(
+                                                                          'No data available'));
+                                                                } else {
+                                                                  // List<Category2> categories2t = snapshot.data!;
+                                                                  // categories2t = categories2.where((category) => category.id_cha == categories[i].id_danhmuc).toList();
+                                                                  // List<Category2>
+                                                                  List<Category2>
+                                                                      categories22 =
+                                                                      snapshot
+                                                                          .data!;
+                                                                  categories22 = categories2
+                                                                      .where((category) =>
+                                                                          category
+                                                                              .id_cha ==
+                                                                          categories[i]
+                                                                              .id_danhmuc)
+                                                                      .toList();
+                                                                  return AlertDialog(
+                                                                    title:
+                                                                        Column(
+                                                                      children: [
+                                                                        ButtonBar(
+                                                                          alignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            for (int j = 0;
+                                                                                j < categories22.length;
+                                                                                j++)
+                                                                              ElevatedButton(
+                                                                                onPressed: () {
+                                                                                  showDialog(
+                                                                                    context: context,
+                                                                                    builder: (BuildContext context) {
+                                                                                      return FutureBuilder<List<Category2>>(
+                                                                                        future: futureCategory3,
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Center(child: CircularProgressIndicator());
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Center(child: Text('Error: ${snapshot.error}'));
+                                                                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                                                            return Center(child: Text('No data available'));
+                                                                                          } else {
+                                                                                            //List<Category2>
+                                                                                            List<Category2> categories32 = snapshot.data!;
+                                                                                            categories32 = categories3.where((category) => category.id_cha == categories22[j].id_danhmuc).toList();
+                                                                                            //print('_____________-${categories32}');
+                                                                                            return AlertDialog(
+                                                                                              title: Column(
+                                                                                                children: [
+                                                                                                  ButtonBar(
+                                                                                                    alignment: MainAxisAlignment.center,
+                                                                                                    children: [
+                                                                                                      for (int h = 0; h < categories32.length; h++)
+                                                                                                        if (categories32.isNotEmpty)
+                                                                                                          ElevatedButton(
+                                                                                                            child: Text(
+                                                                                                              categories32.isNotEmpty
+                                                                                                                  ? categories32[h]?.cap == 3
+                                                                                                                      ? categories32[h]?.tendanhmuc ?? 'khong'
+                                                                                                                      : 'khong'
+                                                                                                                  : 'Loading...',
+                                                                                                            ),
+                                                                                                            onPressed: () {
+                                                                                                              Navigator.push(
+                                                                                                                  context,
+                                                                                                                  MaterialPageRoute(
+                                                                                                                      builder: (context) => AddPromotion(
+                                                                                                                            id_danhmuc: categories32[h]?.id_danhmuc,
+                                                                                                                          )));
+                                                                                                            },
+                                                                                                          )
+                                                                                                    ],
+                                                                                                  )
+                                                                                                ],
+                                                                                              ),
+                                                                                            );
+                                                                                          }
+                                                                                        },
+                                                                                      );
+                                                                                    },
+                                                                                  );
+                                                                                },
+                                                                                child: Text(
+                                                                                  categories22.isNotEmpty
+                                                                                      ? categories22[j]?.cap == 2
+                                                                                          ? categories22[j]?.tendanhmuc ?? 'khong'
+                                                                                          : 'khong'
+                                                                                      : 'Loading...',
+                                                                                ),
+                                                                              )
+                                                                          ],
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              },
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      child: Text(
+                                                        categories.isNotEmpty
+                                                            ? categories[i]?.id_cha ==
+                                                                        0 &&
+                                                                    categories[i]
+                                                                            ?.cap ==
+                                                                        1
+                                                                ? categories[i]
+                                                                        ?.tendanhmuc ??
+                                                                    'khong'
+                                                                : 'khong'
+                                                            : 'Loading...',
+                                                      ),
+                                                    )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                              );
+                            }),
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CardPromotion(quyen: quyen,)));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            height: 50,
+                            width: 400,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom:
+                                    BorderSide(width: 1.0, color: Colors.black),
+                              ),
+                            ),
+                            child: Text('Quản lý khuyến mãi',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CardStaffInfo()));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            height: 50,
+                            width: 400,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom:
+                                    BorderSide(width: 1.0, color: Colors.black),
+                              ),
+                            ),
+                            child: Text('Quản lý nhân viên',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CardUserInfo()));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            height: 50,
+                            width: 400,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom:
+                                    BorderSide(width: 1.0, color: Colors.black),
+                              ),
+                            ),
+                            child: Text('Quản lý khách hàng',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            logout();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            height: 50,
+                            width: 400,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom:
+                                    BorderSide(width: 1.0, color: Colors.black),
+                              ),
+                            ),
+                            child: Text('Đăng xuất',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )));
   }
 }

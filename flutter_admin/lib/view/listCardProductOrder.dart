@@ -1,15 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_admin/view/accout.dart';
 
 import '../Method/api.dart';
 import '../models/Order.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ListCardProductOrder extends StatefulWidget {
-  ListCardProductOrder({
-    super.key,
-    //required this.initialIndex
-  });
+  final int initialIndex;
+  final String? email;
+  ListCardProductOrder(
+      {super.key, required this.initialIndex, required this.email});
   //int initialIndex;
 
   @override
@@ -24,39 +25,99 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
   late List<Order> _ordersDangGiao = [];
   late List<Order> _ordersDaGiao = [];
   late List<Order> _ordersDaHuy = [];
+  late Future<int?> futureQuyen;
+  int? quyen;
+  Future<int?> getUserQuyen() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    quyen = preferences.getInt('quyen');
+    print('___________${quyen}');
+    // return quyen;
+  }
 
   @override
   void initState() {
     super.initState();
     futureEmail = getUserEmail();
-    _fetchOrders('choxacnhan').then((orders) {
+    futureQuyen = getUserQuyen();
+
+    _fetchOrdersAdmin('choxacnhan').then((orders) {
       setState(() {
         _ordersXacnhan = orders;
       });
     });
-    _fetchOrders('dangxuly').then((orders) {
-      setState(() {
-        _ordersDangXuly = orders;
-      });
-    });
-    _fetchOrders('danggiao').then((orders) {
-      setState(() {
-        _ordersDangGiao = orders;
-      });
-    });
-    _fetchOrders('dagiao').then((orders) {
-      setState(() {
-        _ordersDaGiao = orders;
-      });
-    });
-    _fetchOrders('dahuy').then((orders) {
-      setState(() {
-        _ordersDaHuy = orders;
-      });
-    });
+    quyen == null || quyen == 0
+        ? _fetchOrdersAdmin('dangxuly').then((orders) {
+            setState(() {
+              _ordersDangXuly = orders;
+            });
+          })
+        : _fetchOrdersAdmin('dangxuly').then((orders) {
+            setState(() {
+              _ordersDangXuly = orders;
+            });
+          });
+    quyen == null || quyen == 0
+        ? _fetchOrdersAdmin('danggiao').then((orders) {
+            setState(() {
+              _ordersDangGiao = orders;
+            });
+          })
+        : _fetchOrdersAdmin('dangxuly').then((orders) {
+            setState(() {
+              _ordersDangXuly = orders;
+            });
+          });
+    quyen == null || quyen == 0
+        ? _fetchOrdersAdmin('dagiao').then((orders) {
+            setState(() {
+              _ordersDaGiao = orders;
+            });
+          })
+        : _fetchOrdersAdmin('dagiao').then((orders) {
+            setState(() {
+              _ordersDaGiao = orders;
+            });
+          });
+    quyen == null || quyen == 0
+        ? _fetchOrdersAdmin('dahuy').then((orders) {
+            setState(() {
+              _ordersDaHuy = orders;
+            });
+          })
+        : _fetchOrdersAdmin('dahuy').then((orders) {
+            setState(() {
+              _ordersDaHuy = orders;
+            });
+          });
   }
 
-  Future<List<Order>> _fetchOrders(String status) async {
+  Future<List<Order>> _fetchOrdersNhanvien(String status) async {
+    try {
+      String api = API().getUrl('/getOrderAdmin2');
+      final response = await Dio().get(
+        api,
+        queryParameters: {'trangthai': status, 'email_nv': widget.email},
+        options: Options(
+          headers: {'Accept': 'application/json'},
+        ),
+      );
+      //  print('___________________${widget.quyen}');
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = response.data;
+        List<dynamic> data = responseData['orders'];
+        List<Order> orders = data.map((json) => Order.fromJson(json)).toList();
+        return orders;
+      } else {
+        print('Error fetching data: ${response.statusCode}');
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<List<Order>> _fetchOrdersAdmin(String status) async {
     try {
       String api = API().getUrl('/getOrderAdmin');
       final response = await Dio().get(
@@ -68,7 +129,8 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
       );
 
       if (response.statusCode == 200) {
-        List<dynamic> data = response.data;
+        Map<String, dynamic> responseData = response.data;
+        List<dynamic> data = responseData['orders'];
         List<Order> orders = data.map((json) => Order.fromJson(json)).toList();
         return orders;
       } else {
@@ -113,35 +175,35 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
           // Cập nhật lại danh sách đơn hàng cho tab tương ứng
           switch (status) {
             case 'choxacnhan':
-              _fetchOrders('choxacnhan').then((orders) {
+              _fetchOrdersAdmin('choxacnhan').then((orders) {
                 setState(() {
                   _ordersXacnhan = orders;
                 });
               });
               break;
             case 'dangxuly':
-              _fetchOrders('dangxuly').then((orders) {
+              _fetchOrdersAdmin('dangxuly').then((orders) {
                 setState(() {
                   _ordersDangXuly = orders;
                 });
               });
               break;
             case 'danggiao':
-              _fetchOrders('danggiao').then((orders) {
+              _fetchOrdersAdmin('danggiao').then((orders) {
                 setState(() {
                   _ordersDangGiao = orders;
                 });
               });
               break;
             case 'dagiao':
-              _fetchOrders('dagiao').then((orders) {
+              _fetchOrdersAdmin('dagiao').then((orders) {
                 setState(() {
                   _ordersDaGiao = orders;
                 });
               });
               break;
             case 'dahuy':
-              _fetchOrders('dahuy').then((orders) {
+              _fetchOrdersAdmin('dahuy').then((orders) {
                 setState(() {
                   _ordersDaHuy = orders;
                 });
@@ -198,35 +260,35 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
           }
           switch (status) {
             case 'choxacnhan':
-              _fetchOrders('choxacnhan').then((orders) {
+              _fetchOrdersAdmin('choxacnhan').then((orders) {
                 setState(() {
                   _ordersXacnhan = orders;
                 });
               });
               break;
             case 'dangxuly':
-              _fetchOrders('dangxuly').then((orders) {
+              _fetchOrdersAdmin('dangxuly').then((orders) {
                 setState(() {
                   _ordersDangXuly = orders;
                 });
               });
               break;
             case 'danggiao':
-              _fetchOrders('danggiao').then((orders) {
+              _fetchOrdersAdmin('danggiao').then((orders) {
                 setState(() {
                   _ordersDangGiao = orders;
                 });
               });
               break;
             case 'dagiao':
-              _fetchOrders('dagiao').then((orders) {
+              _fetchOrdersAdmin('dagiao').then((orders) {
                 setState(() {
                   _ordersDaGiao = orders;
                 });
               });
               break;
             case 'dahuy':
-              _fetchOrders('dahuy').then((orders) {
+              _fetchOrdersAdmin('dahuy').then((orders) {
                 setState(() {
                   _ordersDaHuy = orders;
                 });
@@ -264,70 +326,78 @@ class _ListCardProductOrderState extends State<ListCardProductOrder> {
   }
 
   Widget _buildOrderList(List<Order> orders, String status) {
-    return orders.isEmpty
-        ? Center(child: Text('Không có đơn hàng $status'))
-        : ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              Order order = orders[index];
-              return OrderCard(
-                  order: order,
-                  status: status,
-                  onUpdate: () => _updateOrder2(order.id, 'dangxuly'));
-            },
-          );
+    return email != null
+        ? orders.isEmpty
+            ? Center(child: Text('Không có đơn hàng $status'))
+            : ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  Order order = orders[index];
+                  return OrderCard(
+                      order: order,
+                      status: status,
+                      onUpdate: () => _updateOrder2(order.id, 'dangxuly'));
+                },
+              )
+        : Center(child: Text('Bạn vui lòng đăng nhập trước'));
   }
 
   Widget _buildOrderListdangxuly(List<Order> orders, String status) {
-    return orders.isEmpty
-        ? Center(child: Text('Không có đơn hàng $status'))
-        : ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              Order order = orders[index];
-              return OrderCard2(
-                  order: order,
-                  status: status,
-                  email: email,
-                  onUpdate: () => _updateOrder2(order.id, 'danggiao'));
-            },
-          );
+    return email != null
+        ? orders.isEmpty
+            ? Center(child: Text('Không có đơn hàng $status'))
+            : ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  Order order = orders[index];
+                  return OrderCard2(
+                      order: order,
+                      status: status,
+                      email: email,
+                      onUpdate: () => _updateOrder2(order.id, 'danggiao'));
+                },
+              )
+        : Center(child: Text('Bạn vui lòng đăng nhập trước'));
   }
 
   Widget _buildOrderListdanggiao(List<Order> orders, String status) {
-    return orders.isEmpty
-        ? Center(child: Text('Không có đơn hàng $status'))
-        : ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              Order order = orders[index];
-              return OrderCard2(
-                  order: order,
-                  status: status,
-                  email: email,
-                  onUpdate: () => _updateOrder2(order.id, 'dagiao'));
-            },
-          );
+    return email != null
+        ? orders.isEmpty
+            ? Center(child: Text('Không có đơn hàng $status'))
+            : ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  Order order = orders[index];
+                  return OrderCard2(
+                      order: order,
+                      status: status,
+                      email: email,
+                      onUpdate: () => _updateOrder2(order.id, 'dagiao'));
+                },
+              )
+        : Center(child: Text('Bạn vui lòng đăng nhập trước'));
   }
 
   Widget _buildOrderLisDagiaovatHuy(List<Order> orders) {
-    return orders.isEmpty
-        ? Center(child: Text('Không có đơn hàng '))
-        : ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              Order order = orders[index];
-              return OrderCardDagiao(
-                order: order,
-              );
-            },
-          );
+    return email != null
+        ? orders.isEmpty
+            ? Center(child: Text('Không có đơn hàng '))
+            : ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  Order order = orders[index];
+                  return OrderCardDagiao(
+                    order: order,
+                  );
+                },
+              )
+        : Center(child: Text('Bạn vui lòng đăng nhập trước'));
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      //initialIndex: widget.initialIndex,
+      initialIndex: widget.initialIndex,
       length: 5,
       child: Scaffold(
         appBar: AppBar(
@@ -435,7 +505,8 @@ class OrderCard extends StatelessWidget {
                     'Total: ${order.tongtien}', // Replace with your total field
                     style: const TextStyle(color: Colors.red, fontSize: 15),
                   ),
-                  Text('Thời gian: ${order.ngaydat}',style: const TextStyle(fontSize: 15)),
+                  Text('Thời gian: ${order.ngaydat}',
+                      style: const TextStyle(fontSize: 15)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -470,83 +541,88 @@ class OrderCard2 extends StatelessWidget {
     required this.order,
     required this.status,
     required this.onUpdate,
-    Key? key, required this.email,
+    Key? key,
+    required this.email,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return email==order.email_nv? Column(
-      children:  [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
+    return email == order.email_nv
+        ? Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('#dh90${order.id}'),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      children: [
+                        Text('#dh90${order.id}'),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      status,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                  )
                 ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                status,
-                style: const TextStyle(
-                  fontSize: 17,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.right,
-              ),
-            )
-          ],
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 130,
-              height: 130,
-              child: Image.network(
-                order.image, // Replace with your image field
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    order.email ?? '', // Replace with your email field
-                    style: const TextStyle(fontSize: 15),
+                  SizedBox(
+                    width: 130,
+                    height: 130,
+                    child: Image.network(
+                      order.image, // Replace with your image field
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  Text(
-                    'Total: ${order.tongtien}', // Replace with your total field
-                    style: const TextStyle(color: Colors.red, fontSize: 15),
-                  ),
-                  Text('Thời gian: ${order.ngaydat}',style: const TextStyle(fontSize: 15)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: onUpdate,
-                          child: const Text(
-                            "Nhận đơn hàng",
-                            style: TextStyle(color: Colors.red),
-                          ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.email ?? '', // Replace with your email field
+                          style: const TextStyle(fontSize: 15),
                         ),
-                      )
-                    ],
-                  ),
+                        Text(
+                          'Total: ${order.tongtien}', // Replace with your total field
+                          style:
+                              const TextStyle(color: Colors.red, fontSize: 15),
+                        ),
+                        Text('Thời gian: ${order.ngaydat}',
+                            style: const TextStyle(fontSize: 15)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: onUpdate,
+                                child: const Text(
+                                  "Nhận đơn hàng",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
                 ],
-              ),
-            )
-          ],
-        )
-      ],
-    ): Center();
+              )
+            ],
+          )
+        : Center();
   }
 }
 
@@ -610,7 +686,8 @@ class OrderCardDagiao extends StatelessWidget {
                     'Total: ${order.tongtien}', // Replace with your total field
                     style: const TextStyle(color: Colors.red, fontSize: 15),
                   ),
-                  Text('Thời gian: ${order.ngaydat}',style: const TextStyle(fontSize: 15)),
+                  Text('Thời gian: ${order.ngaydat}',
+                      style: const TextStyle(fontSize: 15)),
                 ],
               ),
             )
